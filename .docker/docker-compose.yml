@@ -1,0 +1,48 @@
+services:
+  app:
+    build:
+      context: ./php
+    container_name: school_manager_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ../www:/var/www/html
+    networks:
+      - school_manager_network
+
+  web:
+    image: nginx:alpine
+    container_name: school_manager_web
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ../www:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - school_manager_network
+
+  db:
+    image: mariadb:10.11
+    container_name: school_manager_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: school_manager
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: school_user
+      MYSQL_PASSWORD: secret_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - school_manager_network
+
+networks:
+  school_manager_network:
+    driver: bridge
+
+volumes:
+  dbdata:

@@ -12,3 +12,4 @@
 .gemini/
 /**/*/dist/
 /**/*/package-lock.json
+.dev/
