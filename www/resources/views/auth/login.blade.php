@@ -1,33 +1,26 @@
-@extends('layouts.app')
+<x-guest-layout>
+    <form method="POST" action="{{ route('login') }}">
+        @csrf
 
-@section('content')
-<div class="container d-flex align-items-center justify-content-center">
-    <div class="card shadow-lg border-0 rounded-4" style="max-width: 400px; width: 100%;">
-        <div class="card-body p-5">
-            <div class="text-center mb-4">
-                <div class="bg-primary text-white d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-mortarboard-fill fs-2"></i>
-                </div>
-                <h4 class="fw-bold">Acesso ao SGE</h4>
-                <p class="text-muted small">Informe suas credenciais para continuar.</p>
-            </div>
-
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="email" name="email" placeholder="nome@exemplo.com" value="{{ old('email') }}" required autofocus>
-                    <label for="email">E-mail corporativo</label>
-                </div>
-                <div class="form-floating mb-4">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Senha" required>
-                    <label for="password">Senha de acesso</label>
-                </div>
-                
-                <button class="btn btn-primary w-100 py-2 fw-bold" type="submit">
-                    Entrar <i class="bi bi-arrow-right-short ms-1"></i>
-                </button>
-            </form>
+        <!-- Email Address -->
+        <div>
+            <label for="email" class="block font-medium text-sm text-gray-700">E-mail Corporativo</label>
+            <input id="email" class="block mt-1 w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-2" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="nome@escola.com" />
+            @error('email')
+                <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
         </div>
-    </div>
-</div>
-@endsection
+
+        <!-- Password -->
+        <div class="mt-5">
+            <label for="password" class="block font-medium text-sm text-gray-700">Senha de Acesso</label>
+            <input id="password" class="block mt-1 w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-2" type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+        </div>
+
+        <div class="flex items-center justify-end mt-8">
+            <button class="w-full inline-flex justify-center items-center px-4 py-3 bg-blue-600 border border-transparent rounded-lg font-bold text-sm text-white tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                Acessar o SGE
+            </button>
+        </div>
+    </form>
+</x-guest-layout>

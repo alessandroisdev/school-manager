@@ -1,6 +1,8 @@
 <?php
 
-use App\Interfaces\Http\Controllers\Auth\LoginController;
+use App\Interfaces\Http\Controllers\Auth\AuthController;
+use App\Interfaces\Http\Controllers\DashboardController;
+use App\Interfaces\Http\Controllers\UnitSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,14 +10,14 @@ Route::get('/', function () {
 });
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'show'])->name('login');
-    Route::post('/login', [LoginController::class, 'authenticate']);
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'authenticate']);
 });
 
-Route::middleware(['auth', 'unit.context'])->group(function () {
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/unit/switch', [UnitSessionController::class, 'switch'])->name('unit.switch');
     
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // Todas as rotas do painel
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
