@@ -1,3 +1,5 @@
+name: school_manager
+
 services:
   app:
     build:
