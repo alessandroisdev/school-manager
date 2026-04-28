@@ -20,4 +20,5 @@ Route::middleware('auth')->group(function () {
     
     // Todas as rotas do painel
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('students', \App\Interfaces\Http\Controllers\StudentController::class);
 });

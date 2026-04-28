@@ -15,7 +15,19 @@
                     <div class="flex">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
-                            <h2 class="text-2xl font-black text-blue-600 tracking-tight">SGE</h2>
+                            <a href="{{ route('dashboard') }}">
+                                <h2 class="text-2xl font-black text-blue-600 tracking-tight">SGE</h2>
+                            </a>
+                        </div>
+
+                        <!-- Navigation Links -->
+                        <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex items-center">
+                            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'text-blue-600 border-b-2 border-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent' }} px-1 py-5 text-sm transition-colors">
+                                Dashboard
+                            </a>
+                            <a href="{{ route('students.index') }}" class="{{ request()->routeIs('students.*') ? 'text-blue-600 border-b-2 border-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent' }} px-1 py-5 text-sm transition-colors">
+                                Gestão de Alunos
+                            </a>
                         </div>
                     </div>
 
