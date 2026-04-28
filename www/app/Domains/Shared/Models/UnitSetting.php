@@ -9,13 +9,19 @@ class UnitSetting extends Model
 {
     protected $fillable = [
         'unit_id',
-        'key',
-        'value',
+        'calculation_rule',
+        'passing_grade',
+        'passing_attendance',
     ];
 
-    /**
-     * @return BelongsTo<Unit, $this>
-     */
+    protected function casts(): array
+    {
+        return [
+            'passing_grade' => 'float',
+            'passing_attendance' => 'float',
+        ];
+    }
+
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
