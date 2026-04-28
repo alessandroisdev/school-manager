@@ -9,9 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Document extends Model
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
+
+class Document extends Model implements AuditableContract
 {
-    use SoftDeletes, HasUnitScope;
+    use SoftDeletes, HasUnitScope, Auditable;
 
     protected $fillable = [
         'unit_id',

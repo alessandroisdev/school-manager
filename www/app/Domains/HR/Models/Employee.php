@@ -10,9 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Employee extends Model
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
+
+class Employee extends Model implements AuditableContract
 {
-    use SoftDeletes, HasUnitScope;
+    use SoftDeletes, HasUnitScope, Auditable;
 
     protected $fillable = [
         'unit_id',

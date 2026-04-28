@@ -12,9 +12,12 @@ use App\Infrastructure\Persistence\Traits\HasUnitScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class StudentTermPerformance extends Model
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
+
+class StudentTermPerformance extends Model implements AuditableContract
 {
-    use HasUnitScope;
+    use HasUnitScope, Auditable;
 
     protected $fillable = [
         'unit_id',
