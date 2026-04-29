@@ -47,6 +47,15 @@ Route::middleware('auth')->group(function () {
         Route::resource('document-partials', \App\Interfaces\Http\Controllers\Admin\DocumentPartialController::class)->except(['show']);
         Route::get('document-templates/{document_template}/preview', [\App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class, 'previewPdf'])->name('document-templates.preview');
         Route::resource('document-templates', \App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class)->except(['show']);
+        
+        // Módulo de Comunicação Oficial
+        Route::resource('official-categories', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentCategoryController::class)->except(['show']);
+        Route::resource('official-signers', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentSignerController::class)->except(['show']);
+        
+        Route::post('official-documents/{official_document}/publish', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'publish'])->name('official-documents.publish');
+        Route::post('official-documents/{official_document}/cancel', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'cancel'])->name('official-documents.cancel');
+        Route::get('official-documents/{official_document}/pdf', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'generatePdf'])->name('official-documents.pdf');
+        Route::resource('official-documents', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class)->except(['show']);
     });
 
     // Módulo Secretaria
@@ -64,6 +73,12 @@ Route::middleware('auth')->group(function () {
         Route::get('issued-documents/{issuedDocument}', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'show'])->name('issued-documents.show');
         Route::post('issued-documents/{issuedDocument}/cancel', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'cancel'])->name('issued-documents.cancel');
         Route::post('issued-documents/{issuedDocument}/rectify', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'rectify'])->name('issued-documents.rectify');
+
+        // Protocolo de Recebimento de Documentos
+        Route::patch('protocols/{protocol}/status', [\App\Interfaces\Http\Controllers\Secretariat\ProtocolController::class, 'updateStatus'])->name('secretariat.protocols.update-status');
+        Route::resource('protocols', \App\Interfaces\Http\Controllers\Secretariat\ProtocolController::class)
+            ->names('secretariat.protocols')
+            ->except(['edit', 'update', 'destroy']);
     });
 
     // Módulo Acadêmico / Pedagógico

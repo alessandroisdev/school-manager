@@ -1,16 +1,34 @@
 <x-app-layout>
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="h3 mb-1 text-dark fw-bold">Cockpit Executivo</h2>
-                <p class="text-muted small mb-0">Visão gerencial da unidade de ensino.</p>
-            </div>
-            <div>
-                <button class="btn btn-primary bg-gradient shadow-sm rounded-pill px-4">
-                    <i class="bi bi-cloud-download me-2"></i> Relatório PDF
-                </button>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="h3 fw-bold text-dark mb-0">Visão Geral</h2>
+                        <p class="text-muted small">Métricas atualizadas em tempo real</p>
+                    </div>
+                </div>
             </div>
         </div>
+
+        @if(isset($criticalProtocols) && $criticalProtocols->count() > 0)
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 d-flex align-items-center mb-0 p-3 shadow-sm rounded-3">
+                    <i class="bi bi-exclamation-triangle-fill fs-2 text-danger me-3"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="fw-bold text-danger mb-1">Atenção! Você tem {{ $criticalProtocols->count() }} protocolo(s) exigindo ação imediata.</h5>
+                        <p class="text-dark small mb-0">Estes documentos estão atrasados ou vencem nos próximos 3 dias.</p>
+                    </div>
+                    <div>
+                        <a href="{{ route('secretariat.protocols.index') }}" class="btn btn-danger fw-bold shadow-sm">
+                            Ver Protocolos Críticos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
 
         <div class="row g-4 mb-4">
             <!-- Card Alunos -->

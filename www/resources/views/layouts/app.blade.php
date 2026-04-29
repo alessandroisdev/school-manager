@@ -92,6 +92,18 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('secretariat.protocols.index') }}" class="nav-link {{ request()->routeIs('secretariat.protocols.*') ? 'active' : '' }}">
+                        <i class="bi bi-inbox-fill me-2 text-info"></i> Protocolos
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{{ route('admin.official-documents.index') }}" class="nav-link {{ request()->routeIs('admin.official-documents.*') || request()->routeIs('admin.official-categories.*') || request()->routeIs('admin.official-signers.*') ? 'active' : '' }}">
+                        <i class="bi bi-bank2 me-2"></i> Comunicação Oficial
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.*') ? 'active' : '' }}">
                         <i class="bi bi-person-lines-fill me-2"></i> Gestão de Alunos
                     </a>

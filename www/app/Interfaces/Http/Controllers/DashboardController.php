@@ -46,6 +46,18 @@ class DashboardController extends Controller
             ->where('is_active', true)
             ->count();
 
-        return view('dashboard', compact('totalStudents', 'totalRevenue', 'pendingRevenue', 'overdueRevenue', 'totalTeachers'));
+        // Financeiro
+        $pendingInvoices = \App\Domains\Finance\Models\Invoice::where('unit_id', $unitId)
+            ->where('status', 'pending')
+            ->count();
+            
+        // Protocolos Críticos (Vencidos ou Vencendo em 3 dias)
+        $criticalProtocols = \App\Domains\Protocol\Models\DocumentProtocol::where('unit_id', $unitId)
+            ->pending()
+            ->nearDeadline()
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return view('dashboard', compact('totalStudents', 'totalRevenue', 'pendingRevenue', 'overdueRevenue', 'totalTeachers', 'pendingInvoices', 'criticalProtocols'));
     }
 }
