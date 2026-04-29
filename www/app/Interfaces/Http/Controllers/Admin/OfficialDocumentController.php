@@ -210,13 +210,14 @@ class OfficialDocumentController extends Controller
         if ($officialDocument->unit_id != session('active_unit_id')) abort(403);
 
         // Buscar configurações da unidade (logo, nome, cidade)
-        $unit = \App\Domains\Shared\Models\Unit::with('setting')->find(session('active_unit_id'));
+        $unit = \App\Domains\Shared\Models\Unit::with('settings')->find(session('active_unit_id'));
+        $setting = $unit->settings->first();
         
         // Pega URL da logo da escola se houver, ou null
         $logoUrl = null;
-        if ($unit->setting && $unit->setting->logo_path) {
+        if ($setting && $setting->unit_logo) {
             // No domPDF local path works best, so we use public_path
-            $logoUrl = public_path('storage/' . $unit->setting->logo_path);
+            $logoUrl = public_path('storage/' . $setting->unit_logo);
         }
 
         $signatureUrl = null;
@@ -224,8 +225,8 @@ class OfficialDocumentController extends Controller
             $signatureUrl = public_path('storage/' . $officialDocument->signature_image_path);
         }
 
-        $city = $unit->setting ? $unit->setting->address_city : 'Cidade';
-        $state = $unit->setting ? $unit->setting->address_state : 'UF';
+        $city = $unit->city ?: 'Cidade';
+        $state = $unit->state ?: 'UF';
         
         // Formata data Ex: Brasília, 29 de abril de 2026.
         setlocale(LC_TIME, 'pt_BR.utf-8', 'pt_BR', 'pt-br', 'portuguese');
