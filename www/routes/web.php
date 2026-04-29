@@ -101,6 +101,11 @@ Route::middleware('auth')->group(function () {
         Route::post('classes/{class}/batch-documents', [\App\Interfaces\Http\Controllers\Academic\SchoolClassController::class, 'batchDocumentsGenerate'])->name('classes.batch-generate');
         Route::resource('classes', \App\Interfaces\Http\Controllers\Academic\SchoolClassController::class)->except(['show']);
         Route::resource('subjects', \App\Interfaces\Http\Controllers\Academic\SubjectController::class)->except(['show']);
+        Route::post('assignments/generate', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'generate'])->name('assignments.generate');
+        Route::post('assignments/publish', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'publish'])->name('assignments.publish');
+        Route::post('assignments/clear', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'clear'])->name('assignments.clear');
+        Route::post('assignments/move', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'move'])->name('assignments.move');
+        Route::get('assignments/print', [\App\Interfaces\Http\Controllers\Academic\SchedulePrintController::class, 'index'])->name('assignments.print');
         Route::resource('assignments', \App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class)->except(['show', 'edit', 'update']);
 
         // Diário de Classe (Professor)

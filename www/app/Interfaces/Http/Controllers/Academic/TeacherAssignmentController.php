@@ -16,47 +16,83 @@ class TeacherAssignmentController extends Controller
     {
         $unitId = session('active_unit_id');
         
-        if ($request->ajax()) {
-            $query = TeacherAssignment::with(['teacher.employee', 'schoolClass.grade', 'subject'])
-                ->whereHas('schoolClass', function($q) use ($unitId) {
-                    $q->where('unit_id', $unitId);
-                })->latest();
-            
-            return \Yajra\DataTables\Facades\DataTables::of($query)
-                ->addColumn('teacher_name', function($assignment) {
-                    $employee = $assignment->teacher->employee ?? null;
-                    return '<div class="fw-bold text-info"><i class="bi bi-person-video3 me-1"></i> ' . ($employee->name ?? 'Professor Removido') . '</div>';
-                })
-                ->addColumn('class_info', function($assignment) {
-                    $class = $assignment->schoolClass;
-                    return '<div class="fw-bold text-dark">' . ($class->name ?? 'N/A') . '</div>
-                            <div class="small text-muted">' . ($class->grade->name ?? 'Série Removida') . '</div>';
-                })
-                ->addColumn('subject_info', function($assignment) {
-                    return '<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1"><i class="bi bi-book-half me-1"></i> ' . ($assignment->subject->name ?? 'Disciplina Removida') . '</span>';
-                })
-                ->addColumn('workload', function($assignment) {
-                    return $assignment->assigned_workload . 'h';
-                })
-                ->addColumn('actions', function($assignment) {
-                    $deleteUrl = route('academic.assignments.destroy', $assignment);
-                    $csrf = csrf_field();
-                    $method = method_field('DELETE');
+        // Dados para o Kanban
+        $shifts = \App\Domains\Academic\Models\Shift::where('unit_id', $unitId)->get();
+        $classes = SchoolClass::with('shift', 'grade')->where('unit_id', $unitId)->get();
+        $teachers = Teacher::with(['employee', 'assignments.subject', 'assignments.schoolClass'])
+            ->whereHas('employee', function($q) use ($unitId) {
+                $q->where('unit_id', $unitId)->where('is_active', true);
+            })->get();
 
-                    return '
-                        <div class="text-end text-nowrap">
-                            <form action="' . $deleteUrl . '" method="POST" class="d-inline-block form-delete">
-                                ' . $csrf . $method . '
-                                <button type="submit" class="btn btn-sm btn-light text-danger fw-bold"><i class="bi bi-trash"></i> Desalocar</button>
-                            </form>
-                        </div>
-                    ';
-                })
-                ->rawColumns(['teacher_name', 'class_info', 'subject_info', 'actions'])
-                ->make(true);
+        $subjects = Subject::where('unit_id', $unitId)->where('is_active', true)->get();
+
+        $aiService = new \App\Services\Academic\ScheduleAIGenerator($unitId);
+        $suggestions = $aiService->getSuggestions();
+
+        // Verificar se existem drafts
+        $hasDrafts = \App\Domains\Academic\Models\Schedule::where('unit_id', $unitId)->where('status', 'draft')->exists() || 
+                     TeacherAssignment::whereHas('schoolClass', function($q) use ($unitId) { $q->where('unit_id', $unitId); })->where('status', 'draft')->exists();
+
+        return view('academic.assignments.index', compact('classes', 'teachers', 'shifts', 'subjects', 'suggestions', 'hasDrafts'));
+    }
+
+    public function generate(Request $request)
+    {
+        $unitId = session('active_unit_id');
+        $aiService = new \App\Services\Academic\ScheduleAIGenerator($unitId);
+        
+        $teacherId = $request->input('teacher_id'); // Opcional, para alocar só um professor
+        
+        // Se for geral, limpa draft existente
+        if (!$teacherId) {
+            $aiService->clearDraft();
         }
 
-        return view('academic.assignments.index');
+        $result = $aiService->generateSchedule($teacherId);
+
+        if (count($result['warnings']) > 0) {
+            return back()->with('warning', 'Alocação gerada com ressalvas: ' . implode(" ", $result['warnings']));
+        }
+
+        return back()->with('success', 'Rascunho de alocação gerado com sucesso via IA! Revise antes de publicar.');
+    }
+
+    public function publish(Request $request)
+    {
+        $unitId = session('active_unit_id');
+        $aiService = new \App\Services\Academic\ScheduleAIGenerator($unitId);
+        $aiService->publishSchedule();
+
+        return back()->with('success', 'Grade publicada com sucesso!');
+    }
+
+    public function clear(Request $request)
+    {
+        $unitId = session('active_unit_id');
+        $aiService = new \App\Services\Academic\ScheduleAIGenerator($unitId);
+        $aiService->clearDraft();
+
+        return back()->with('success', 'Rascunho limpo.');
+    }
+
+    public function move(Request $request)
+    {
+        $request->validate([
+            'teacher_id' => 'required|exists:teachers,id',
+            'school_class_id' => 'required|exists:school_classes,id',
+            'subject_id' => 'required|exists:subjects,id',
+        ]);
+
+        // Drag and Drop salva direto como draft
+        TeacherAssignment::create([
+            'teacher_id' => $request->teacher_id,
+            'school_class_id' => $request->school_class_id,
+            'subject_id' => $request->subject_id,
+            'assigned_workload' => Subject::find($request->subject_id)->workload ?? 40,
+            'status' => 'draft',
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
     public function create()

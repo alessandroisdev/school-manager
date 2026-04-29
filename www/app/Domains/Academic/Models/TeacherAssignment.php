@@ -16,6 +16,7 @@ class TeacherAssignment extends Model
         'school_class_id',
         'subject_id',
         'assigned_workload',
+        'status',
     ];
 
     public function teacher(): BelongsTo

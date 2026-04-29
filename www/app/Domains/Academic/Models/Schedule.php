@@ -20,6 +20,7 @@ class Schedule extends Model
         'school_class_id',
         'time_slot_id',
         'day_of_week',
+        'status',
     ];
 
     public function unit(): BelongsTo
