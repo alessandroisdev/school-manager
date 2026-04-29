@@ -3,10 +3,12 @@
         
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h3 mb-0 text-dark fw-bold">Painel Financeiro</h2>
-            <!-- No futuro: Botão de gerar faturas em lote -->
-            <button class="btn btn-outline-secondary fw-bold shadow-sm" disabled>
-                <i class="bi bi-file-earmark-plus me-1"></i> Gerar Faturas (Em breve)
-            </button>
+            <form action="{{ route('finance.carnet.batch-generate') }}" method="POST" class="d-inline" onsubmit="return confirm('Isso gerará os carnês de todas as turmas que possuem Precificação cadastrada para todos os alunos ativos que ainda não possuem carnê. Deseja continuar?');">
+                @csrf
+                <button type="submit" class="btn btn-primary fw-bold shadow-sm">
+                    <i class="bi bi-file-earmark-plus me-1"></i> Gerar Faturas em Lote
+                </button>
+            </form>
         </div>
 
         <!-- Indicadores Financeiros (Cards) -->

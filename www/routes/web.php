@@ -135,12 +135,11 @@ Route::middleware('auth')->group(function () {
     // Módulo Financeiro
     Route::prefix('finance')->name('finance.')->group(function () {
         Route::post('carnet/generate', [\App\Interfaces\Http\Controllers\Finance\CarnetController::class, 'generate'])->name('carnet.generate');
+        Route::post('carnet/batch-generate', [\App\Interfaces\Http\Controllers\Finance\CarnetController::class, 'batchGenerate'])->name('carnet.batch-generate');
         Route::get('boleto/{invoice}', [\App\Interfaces\Http\Controllers\Finance\BoletoController::class, 'show'])->name('boleto.show');
         
         // Cadastros Financeiros (Apenas Admin/Direção)
-        Route::middleware(['role:admin|diretor'])->group(function() {
-            Route::resource('bank-accounts', \App\Interfaces\Http\Controllers\Finance\BankAccountController::class);
-            Route::resource('class-pricings', \App\Interfaces\Http\Controllers\Finance\ClassPricingController::class);
-        });
+        Route::resource('bank-accounts', \App\Interfaces\Http\Controllers\Finance\BankAccountController::class);
+        Route::resource('class-pricings', \App\Interfaces\Http\Controllers\Finance\ClassPricingController::class);
     });
 });

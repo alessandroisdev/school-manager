@@ -83,4 +83,78 @@ class CarnetController extends Controller
 
         return back()->with('success', "Carnê de {$installments} parcelas (R$ " . number_format($amountPerInstallment, 2, ',', '.') . "/mês) gerado com sucesso!");
     }
+
+    public function batchGenerate(Request $request)
+    {
+        $unitId = session('active_unit_id');
+        
+        // Buscar Conta Bancária Padrão
+        $bankAccount = BankAccount::where('unit_id', $unitId)->where('is_active', true)->first();
+        if (!$bankAccount) {
+            return back()->with('warning', 'Nenhuma conta bancária configurada para emitir o boleto.');
+        }
+
+        $unitSettings = UnitSetting::where('unit_id', $unitId)->first();
+        $startMonth = Carbon::now()->month;
+        $startYear = Carbon::now()->year;
+
+        // Pega todos os alunos enturmados
+        $students = Student::where('unit_id', $unitId)
+            ->with(['enrollments' => function($q) {
+                $q->whereIn('status', ['active', 'ativa'])->with('schoolClass');
+            }])->get();
+
+        $generatedCount = 0;
+
+        DB::transaction(function() use ($students, $unitId, $bankAccount, $startMonth, $startYear) {
+            foreach ($students as $student) {
+                $enrollment = $student->enrollments->first();
+                if (!$enrollment) continue;
+
+                $class = $enrollment->schoolClass;
+                
+                // Buscar Precificação
+                $pricing = ClassPricing::where('unit_id', $unitId)
+                    ->where('grade_id', $class->grade_id)
+                    ->where('shift_id', $class->shift_id)
+                    ->first();
+
+                if (!$pricing) continue;
+
+                // Verifica se já existe carnê
+                $existing = Invoice::where('student_id', $student->id)
+                    ->where('enrollment_id', $enrollment->id)->exists();
+                
+                if ($existing) continue;
+
+                // Calcular parcelas
+                $installments = $pricing->installments_count > 0 ? $pricing->installments_count : 12;
+                $amountPerInstallment = round($pricing->annual_amount / $installments, 2);
+
+                for ($i = 1; $i <= $installments; $i++) {
+                    $dueDate = Carbon::create($startYear, $startMonth, 1)->addMonths($i - 1)->day($pricing->default_due_day);
+                    
+                    Invoice::create([
+                        'unit_id' => $unitId,
+                        'student_id' => $student->id,
+                        'enrollment_id' => $enrollment->id,
+                        'bank_account_id' => $bankAccount->id,
+                        'amount' => $amountPerInstallment,
+                        'installment_number' => $i,
+                        'due_date' => $dueDate,
+                        'status' => 'pending',
+                        'description' => "Mensalidade Escolar - Parcela {$i}/{$installments}",
+                    ]);
+                }
+                
+                $generatedCount++;
+            }
+        });
+
+        if ($generatedCount > 0) {
+            return back()->with('success', "Carnês gerados para {$generatedCount} aluno(s) com sucesso!");
+        } else {
+            return back()->with('info', 'Nenhum novo carnê foi gerado. Os alunos ativos já possuem carnês ou não há precificação cadastrada para as suas turmas.');
+        }
+    }
 }
