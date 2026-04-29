@@ -5,7 +5,7 @@ namespace App\Interfaces\Http\Controllers\Finance;
 use App\Domains\Academic\Models\Grade;
 use App\Domains\Academic\Models\Shift;
 use App\Domains\Finance\Models\ClassPricing;
-use App\Interfaces\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use App\Interfaces\Http\Requests\Finance\ClassPricingRequest;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;

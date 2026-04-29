@@ -3,7 +3,7 @@
 namespace App\Interfaces\Http\Controllers\Finance;
 
 use App\Domains\Finance\Models\BankAccount;
-use App\Interfaces\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use App\Interfaces\Http\Requests\Finance\BankAccountRequest;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
