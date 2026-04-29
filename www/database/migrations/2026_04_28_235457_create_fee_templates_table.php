@@ -6,21 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('unit_settings', function (Blueprint $table) {
+        Schema::create('fee_templates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
-            $table->string('key');
-            $table->text('value')->nullable();
+            $table->string('name');
+            $table->decimal('total_amount', 10, 2);
+            $table->integer('installments_count');
             $table->timestamps();
-            
-            $table->unique(['unit_id', 'key']);
+            $table->softDeletes();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('unit_settings');
+        Schema::dropIfExists('fee_templates');
     }
 };
