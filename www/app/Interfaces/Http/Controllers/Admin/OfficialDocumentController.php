@@ -42,9 +42,9 @@ class OfficialDocumentController extends Controller
                     return '<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1 rounded-pill"><i class="bi bi-pencil me-1"></i> Rascunho</span>';
                 })
                 ->addColumn('actions', function($doc) {
-                    $editUrl = route('admin.official-documents.edit', $doc);
-                    $pdfUrl = route('admin.official-documents.pdf', $doc);
-                    $cancelUrl = route('admin.official-documents.cancel', $doc);
+                    $editUrl = route('admin.documents.edit', $doc);
+                    $pdfUrl = route('admin.documents.pdf', $doc);
+                    $cancelUrl = route('admin.documents.cancel', $doc);
                     $csrf = csrf_field();
 
                     $html = '<div class="text-end text-nowrap">';
@@ -55,7 +55,7 @@ class OfficialDocumentController extends Controller
                     
                     if ($doc->status === 'draft') {
                         $html .= '<a href="' . $editUrl . '" class="btn btn-sm btn-light text-primary fw-bold me-2"><i class="bi bi-pencil-square"></i></a>';
-                        $html .= '<form action="' . route('admin.official-documents.publish', $doc) . '" method="POST" class="d-inline-block me-2">
+                        $html .= '<form action="' . route('admin.documents.publish', $doc) . '" method="POST" class="d-inline-block me-2">
                                     ' . $csrf . '
                                     <button type="submit" class="btn btn-sm btn-primary fw-bold" onclick="return confirm(\'Ao publicar, o ofício não poderá mais ser alterado, apenas cancelado. Continuar?\')"><i class="bi bi-check2-all"></i> Publicar</button>
                                   </form>';
@@ -75,7 +75,7 @@ class OfficialDocumentController extends Controller
                 ->make(true);
         }
 
-        return view('admin.official-documents.index');
+        return view('admin.documents.index');
     }
 
     public function create()
@@ -88,7 +88,7 @@ class OfficialDocumentController extends Controller
             return redirect()->route('admin.official-categories.index')->with('error', 'Crie pelo menos uma Categoria de Ofício antes de emitir documentos.');
         }
 
-        return view('admin.official-documents.create', compact('categories', 'signers'));
+        return view('admin.documents.create', compact('categories', 'signers'));
     }
 
     public function store(Request $request, NumberingService $numberingService)
@@ -135,20 +135,20 @@ class OfficialDocumentController extends Controller
 
         $document = OfficialDocument::create($docData);
 
-        return redirect()->route('admin.official-documents.index')->with('success', 'Ofício gerado como RASCUNHO com sucesso! Número: ' . $fullNumber);
+        return redirect()->route('admin.documents.index')->with('success', 'Ofício gerado como RASCUNHO com sucesso! Número: ' . $fullNumber);
     }
 
     public function edit(OfficialDocument $officialDocument)
     {
         if ($officialDocument->unit_id != session('active_unit_id')) abort(403);
         if ($officialDocument->status !== 'draft') {
-            return redirect()->route('admin.official-documents.index')->with('error', 'Apenas documentos em rascunho podem ser editados.');
+            return redirect()->route('admin.documents.index')->with('error', 'Apenas documentos em rascunho podem ser editados.');
         }
 
         $categories = OfficialDocumentCategory::where('unit_id', session('active_unit_id'))->get();
         $signers = OfficialDocumentSigner::where('unit_id', session('active_unit_id'))->where('is_active', true)->get();
 
-        return view('admin.official-documents.edit', compact('officialDocument', 'categories', 'signers'));
+        return view('admin.documents.edit', compact('officialDocument', 'categories', 'signers'));
     }
 
     public function update(Request $request, OfficialDocument $officialDocument)
@@ -186,7 +186,7 @@ class OfficialDocumentController extends Controller
 
         $officialDocument->update($docData);
 
-        return redirect()->route('admin.official-documents.index')->with('success', 'Rascunho atualizado com sucesso!');
+        return redirect()->route('admin.documents.index')->with('success', 'Rascunho atualizado com sucesso!');
     }
 
     public function publish(OfficialDocument $officialDocument)
@@ -194,7 +194,7 @@ class OfficialDocumentController extends Controller
         if ($officialDocument->unit_id != session('active_unit_id')) abort(403);
         
         $officialDocument->update(['status' => 'published']);
-        return redirect()->route('admin.official-documents.index')->with('success', 'Documento publicado. Agora ele tem validade legal e não pode mais ser alterado.');
+        return redirect()->route('admin.documents.index')->with('success', 'Documento publicado. Agora ele tem validade legal e não pode mais ser alterado.');
     }
 
     public function cancel(OfficialDocument $officialDocument)
@@ -202,7 +202,7 @@ class OfficialDocumentController extends Controller
         if ($officialDocument->unit_id != session('active_unit_id')) abort(403);
         
         $officialDocument->update(['status' => 'cancelled']);
-        return redirect()->route('admin.official-documents.index')->with('success', 'Documento cancelado!');
+        return redirect()->route('admin.documents.index')->with('success', 'Documento cancelado!');
     }
 
     public function generatePdf(OfficialDocument $officialDocument)
@@ -232,7 +232,7 @@ class OfficialDocumentController extends Controller
         setlocale(LC_TIME, 'pt_BR.utf-8', 'pt_BR', 'pt-br', 'portuguese');
         $dateFormatted = Carbon::parse($officialDocument->date)->isoFormat('D [de] MMMM [de] YYYY');
 
-        $html = view('admin.official-documents.pdf', compact('officialDocument', 'unit', 'logoUrl', 'signatureUrl', 'city', 'state', 'dateFormatted'))->render();
+        $html = view('admin.documents.pdf', compact('officialDocument', 'unit', 'logoUrl', 'signatureUrl', 'city', 'state', 'dateFormatted'))->render();
 
         // Configuração ABNT (Manual PR)
         $pdf = Pdf::loadHTML($html)->setPaper('A4', 'portrait');

@@ -6,7 +6,7 @@
                 <p class="text-muted small mb-0">Gerencie Portarias, Memorandos, Ofícios, etc.</p>
             </div>
             <div>
-                <a href="{{ route('admin.official-documents.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm me-2">
+                <a href="{{ route('admin.documents.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm me-2">
                     <i class="bi bi-arrow-left me-1"></i> Voltar aos Ofícios
                 </a>
                 <a href="{{ route('admin.official-categories.create') }}" class="btn btn-primary fw-bold shadow-sm">
@@ -23,8 +23,9 @@
                     ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
                 ];
             @endphp
-            
-            <x-datatable id="categoriesTable" url="{{ route('admin.official-categories.index') }}" :columns="$columns" />
+
+            <x-datatable id="categoriesTable" url="{{ route('admin.official-categories.index') }}"
+                :columns="$columns" />
         </div>
     </div>
 </x-app-layout>

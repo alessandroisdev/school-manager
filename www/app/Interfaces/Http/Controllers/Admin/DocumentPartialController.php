@@ -22,8 +22,8 @@ class DocumentPartialController extends Controller
                         : '<span class="badge bg-secondary">Rodapé</span>';
                 })
                 ->addColumn('actions', function($partial) {
-                    $editUrl = route('admin.document-partials.edit', $partial);
-                    $deleteUrl = route('admin.document-partials.destroy', $partial);
+                    $editUrl = route('admin.partials.edit', $partial);
+                    $deleteUrl = route('admin.partials.destroy', $partial);
                     $csrf = csrf_field();
                     $method = method_field('DELETE');
 
@@ -41,12 +41,12 @@ class DocumentPartialController extends Controller
                 ->make(true);
         }
 
-        return view('admin.document-partials.index');
+        return view('admin.partials.index');
     }
 
     public function create()
     {
-        return view('admin.document-partials.create');
+        return view('admin.partials.create');
     }
 
     public function store(Request $request)
@@ -63,12 +63,12 @@ class DocumentPartialController extends Controller
 
         DocumentPartial::create($validated);
 
-        return redirect()->route('admin.document-partials.index')->with('success', 'Bloco criado com sucesso!');
+        return redirect()->route('admin.partials.index')->with('success', 'Bloco criado com sucesso!');
     }
 
     public function edit(DocumentPartial $documentPartial)
     {
-        return view('admin.document-partials.edit', compact('documentPartial'));
+        return view('admin.partials.edit', compact('documentPartial'));
     }
 
     public function update(Request $request, DocumentPartial $documentPartial)
@@ -84,12 +84,12 @@ class DocumentPartialController extends Controller
 
         $documentPartial->update($validated);
 
-        return redirect()->route('admin.document-partials.index')->with('success', 'Bloco atualizado com sucesso!');
+        return redirect()->route('admin.partials.index')->with('success', 'Bloco atualizado com sucesso!');
     }
 
     public function destroy(DocumentPartial $documentPartial)
     {
         $documentPartial->delete();
-        return redirect()->route('admin.document-partials.index')->with('success', 'Bloco removido!');
+        return redirect()->route('admin.partials.index')->with('success', 'Bloco removido!');
     }
 }

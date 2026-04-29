@@ -22,8 +22,8 @@ class BankAccountController extends Controller
                         : '<span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 rounded-pill">Inativo</span>';
                 })
                 ->addColumn('actions', function($account) {
-                    $editUrl = route('finance.bank-accounts.edit', $account);
-                    $deleteUrl = route('finance.bank-accounts.destroy', $account);
+                    $editUrl = route('finance.accounts.edit', $account);
+                    $deleteUrl = route('finance.accounts.destroy', $account);
                     $csrf = csrf_field();
                     $method = method_field('DELETE');
                     
@@ -41,12 +41,12 @@ class BankAccountController extends Controller
                 ->make(true);
         }
 
-        return view('finance.bank-accounts.index');
+        return view('finance.accounts.index');
     }
 
     public function create()
     {
-        return view('finance.bank-accounts.create');
+        return view('finance.accounts.create');
     }
 
     public function store(BankAccountRequest $request)
@@ -57,7 +57,7 @@ class BankAccountController extends Controller
 
         BankAccount::create($data);
 
-        return redirect()->route('finance.bank-accounts.index')->with('success', 'Conta bancária cadastrada com sucesso.');
+        return redirect()->route('finance.accounts.index')->with('success', 'Conta bancária cadastrada com sucesso.');
     }
 
     public function edit(BankAccount $bankAccount)
@@ -66,7 +66,7 @@ class BankAccountController extends Controller
             abort(403);
         }
         
-        return view('finance.bank-accounts.edit', compact('bankAccount'));
+        return view('finance.accounts.edit', compact('bankAccount'));
     }
 
     public function update(BankAccountRequest $request, BankAccount $bankAccount)
@@ -80,7 +80,7 @@ class BankAccountController extends Controller
 
         $bankAccount->update($data);
 
-        return redirect()->route('finance.bank-accounts.index')->with('success', 'Conta bancária atualizada com sucesso.');
+        return redirect()->route('finance.accounts.index')->with('success', 'Conta bancária atualizada com sucesso.');
     }
 
     public function destroy(BankAccount $bankAccount)
@@ -91,7 +91,7 @@ class BankAccountController extends Controller
 
         $bankAccount->delete();
 
-        return redirect()->route('finance.bank-accounts.index')->with('success', 'Conta bancária removida com sucesso.');
+        return redirect()->route('finance.accounts.index')->with('success', 'Conta bancária removida com sucesso.');
     }
 }
 

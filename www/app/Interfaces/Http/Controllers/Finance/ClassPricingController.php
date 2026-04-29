@@ -31,8 +31,8 @@ class ClassPricingController extends Controller
                     return $pricing->installments_count . 'x de R$ ' . number_format($pricing->annual_amount / $pricing->installments_count, 2, ',', '.');
                 })
                 ->addColumn('actions', function($pricing) {
-                    $editUrl = route('finance.class-pricings.edit', $pricing);
-                    $deleteUrl = route('finance.class-pricings.destroy', $pricing);
+                    $editUrl = route('finance.pricings.edit', $pricing);
+                    $deleteUrl = route('finance.pricings.destroy', $pricing);
                     $csrf = csrf_field();
                     $method = method_field('DELETE');
                     
@@ -50,14 +50,14 @@ class ClassPricingController extends Controller
                 ->make(true);
         }
 
-        return view('finance.class-pricings.index');
+        return view('finance.pricings.index');
     }
 
     public function create()
     {
         $grades = Grade::all();
         $shifts = Shift::all();
-        return view('finance.class-pricings.create', compact('grades', 'shifts'));
+        return view('finance.pricings.create', compact('grades', 'shifts'));
     }
 
     public function store(ClassPricingRequest $request)
@@ -67,7 +67,7 @@ class ClassPricingController extends Controller
 
         ClassPricing::create($data);
 
-        return redirect()->route('finance.class-pricings.index')->with('success', 'Precificação cadastrada com sucesso.');
+        return redirect()->route('finance.pricings.index')->with('success', 'Precificação cadastrada com sucesso.');
     }
 
     public function edit(ClassPricing $classPricing)
@@ -79,7 +79,7 @@ class ClassPricingController extends Controller
         $grades = Grade::all();
         $shifts = Shift::all();
         
-        return view('finance.class-pricings.edit', compact('classPricing', 'grades', 'shifts'));
+        return view('finance.pricings.edit', compact('classPricing', 'grades', 'shifts'));
     }
 
     public function update(ClassPricingRequest $request, ClassPricing $classPricing)
@@ -92,7 +92,7 @@ class ClassPricingController extends Controller
 
         $classPricing->update($data);
 
-        return redirect()->route('finance.class-pricings.index')->with('success', 'Precificação atualizada com sucesso.');
+        return redirect()->route('finance.pricings.index')->with('success', 'Precificação atualizada com sucesso.');
     }
 
     public function destroy(ClassPricing $classPricing)
@@ -103,7 +103,7 @@ class ClassPricingController extends Controller
 
         $classPricing->delete();
 
-        return redirect()->route('finance.class-pricings.index')->with('success', 'Precificação removida com sucesso.');
+        return redirect()->route('finance.pricings.index')->with('success', 'Precificação removida com sucesso.');
     }
 }
 

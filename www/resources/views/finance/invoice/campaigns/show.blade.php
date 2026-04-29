@@ -2,24 +2,26 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <a href="{{ route('finance.invoice-campaigns.index') }}" class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-arrow-left"></i> Voltar</a>
+                <a href="{{ route('finance.invoice.campaigns.index') }}"
+                    class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-arrow-left"></i> Voltar</a>
                 <h2 class="h3 mb-0 text-dark fw-bold">Campanha: {{ $invoiceCampaign->name }}</h2>
             </div>
-            
+
             <div class="d-flex gap-2">
                 @if($stats['failed'] > 0)
-                <form action="{{ route('finance.invoice-campaigns.retry', $invoiceCampaign) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-warning shadow-sm fw-bold">
-                        <i class="bi bi-arrow-clockwise me-1"></i> Reprocessar {{ $stats['failed'] }} Falhas
-                    </button>
-                </form>
+                    <form action="{{ route('finance.invoice.campaigns.retry', $invoiceCampaign) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-warning shadow-sm fw-bold">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Reprocessar {{ $stats['failed'] }} Falhas
+                        </button>
+                    </form>
                 @endif
-                
+
                 @if($invoiceCampaign->status === 'completed' && $invoiceCampaign->zip_path)
-                <a href="{{ asset('storage/' . $invoiceCampaign->zip_path) }}" class="btn btn-success shadow-sm fw-bold" target="_blank" download>
-                    <i class="bi bi-file-zip me-1"></i> Baixar Lote (Gráfica)
-                </a>
+                    <a href="{{ asset('storage/' . $invoiceCampaign->zip_path) }}" class="btn btn-success shadow-sm fw-bold"
+                        target="_blank" download>
+                        <i class="bi bi-file-zip me-1"></i> Baixar Lote (Gráfica)
+                    </a>
                 @endif
             </div>
         </div>
@@ -62,8 +64,9 @@
                     ['name' => 'created_at', 'label' => 'Data', 'searchable' => false],
                 ];
             @endphp
-            
-            <x-datatable id="itemsTable" url="{{ route('finance.invoice-campaigns.show', $invoiceCampaign) }}" :columns="$columns" />
+
+            <x-datatable id="itemsTable" url="{{ route('finance.invoice.campaigns.show', $invoiceCampaign) }}"
+                :columns="$columns" />
         </div>
     </div>
 </x-app-layout>

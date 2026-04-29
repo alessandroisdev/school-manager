@@ -1,8 +1,9 @@
 <x-app-layout>
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h3 mb-0 text-dark fw-bold"><i class="bi bi-tags me-2 text-primary"></i> Precificação de Turmas</h2>
-            <a href="{{ route('finance.class-pricings.create') }}" class="btn btn-primary fw-bold shadow-sm">
+            <h2 class="h3 mb-0 text-dark fw-bold"><i class="bi bi-tags me-2 text-primary"></i> Precificação de Turmas
+            </h2>
+            <a href="{{ route('finance.pricings.create') }}" class="btn btn-primary fw-bold shadow-sm">
                 <i class="bi bi-plus-lg me-1"></i> Nova Regra
             </a>
         </div>
@@ -21,7 +22,7 @@
                         ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
                     ];
                 @endphp
-                <x-datatable id="classPricingsTable" url="{{ route('finance.class-pricings.index') }}" :columns="$columns" />
+                <x-datatable id="classPricingsTable" url="{{ route('finance.pricings.index') }}" :columns="$columns" />
             </div>
         </div>
     </div>

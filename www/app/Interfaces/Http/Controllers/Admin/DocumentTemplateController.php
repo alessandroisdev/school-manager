@@ -34,9 +34,9 @@ class DocumentTemplateController extends Controller
                     return $h . $f;
                 })
                 ->addColumn('actions', function($template) {
-                    $editUrl = route('admin.document-templates.edit', $template);
-                    $previewUrl = route('admin.document-templates.preview', $template);
-                    $deleteUrl = route('admin.document-templates.destroy', $template);
+                    $editUrl = route('admin.templates.edit', $template);
+                    $previewUrl = route('admin.templates.preview', $template);
+                    $deleteUrl = route('admin.templates.destroy', $template);
                     $csrf = csrf_field();
                     $method = method_field('DELETE');
 
@@ -55,7 +55,7 @@ class DocumentTemplateController extends Controller
                 ->make(true);
         }
 
-        return view('admin.document-templates.index');
+        return view('admin.templates.index');
     }
 
     public function create()
@@ -64,7 +64,7 @@ class DocumentTemplateController extends Controller
         $headers = DocumentPartial::where('unit_id', $unitId)->where('type', 'header')->where('is_active', true)->get();
         $footers = DocumentPartial::where('unit_id', $unitId)->where('type', 'footer')->where('is_active', true)->get();
         
-        return view('admin.document-templates.builder', compact('headers', 'footers'));
+        return view('admin.templates.builder', compact('headers', 'footers'));
     }
 
     public function store(Request $request)
@@ -85,7 +85,7 @@ class DocumentTemplateController extends Controller
 
         DocumentTemplate::create($validated);
 
-        return redirect()->route('admin.document-templates.index')->with('success', 'Template salvo com sucesso!');
+        return redirect()->route('admin.templates.index')->with('success', 'Template salvo com sucesso!');
     }
 
     public function edit(DocumentTemplate $documentTemplate)
@@ -94,7 +94,7 @@ class DocumentTemplateController extends Controller
         $headers = DocumentPartial::where('unit_id', $unitId)->where('type', 'header')->where('is_active', true)->get();
         $footers = DocumentPartial::where('unit_id', $unitId)->where('type', 'footer')->where('is_active', true)->get();
         
-        return view('admin.document-templates.builder', compact('documentTemplate', 'headers', 'footers'));
+        return view('admin.templates.builder', compact('documentTemplate', 'headers', 'footers'));
     }
 
     public function update(Request $request, DocumentTemplate $documentTemplate)
@@ -112,13 +112,13 @@ class DocumentTemplateController extends Controller
 
         $documentTemplate->update($validated);
 
-        return redirect()->route('admin.document-templates.index')->with('success', 'Template atualizado com sucesso!');
+        return redirect()->route('admin.templates.index')->with('success', 'Template atualizado com sucesso!');
     }
 
     public function destroy(DocumentTemplate $documentTemplate)
     {
         $documentTemplate->delete();
-        return redirect()->route('admin.document-templates.index')->with('success', 'Template removido!');
+        return redirect()->route('admin.templates.index')->with('success', 'Template removido!');
     }
 
     public function previewPdf(DocumentTemplate $documentTemplate)
@@ -141,7 +141,7 @@ class DocumentTemplateController extends Controller
         $html = str_replace(array_keys($mockData), array_values($mockData), $html);
 
         // Render PDF
-        $pdf = Pdf::loadView('admin.document-templates.pdf_layout', [
+        $pdf = Pdf::loadView('admin.templates.pdf_layout', [
             'header' => $documentTemplate->header ? $documentTemplate->header->content : '',
             'footer' => $documentTemplate->footer ? $documentTemplate->footer->content : '',
             'content' => $html,

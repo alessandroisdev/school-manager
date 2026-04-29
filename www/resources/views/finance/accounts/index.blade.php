@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h3 mb-0 text-dark fw-bold"><i class="bi bi-bank me-2 text-primary"></i> Contas Bancárias</h2>
-            <a href="{{ route('finance.bank-accounts.create') }}" class="btn btn-primary fw-bold shadow-sm">
+            <a href="{{ route('finance.accounts.create') }}" class="btn btn-primary fw-bold shadow-sm">
                 <i class="bi bi-plus-lg me-1"></i> Nova Conta
             </a>
         </div>
@@ -22,7 +22,7 @@
                         ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
                     ];
                 @endphp
-                <x-datatable id="bankAccountsTable" url="{{ route('finance.bank-accounts.index') }}" :columns="$columns" />
+                <x-datatable id="bankAccountsTable" url="{{ route('finance.accounts.index') }}" :columns="$columns" />
             </div>
         </div>
     </div>

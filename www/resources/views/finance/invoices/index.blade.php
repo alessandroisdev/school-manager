@@ -1,13 +1,15 @@
 <x-app-layout>
     <div class="container-fluid">
-        
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h3 mb-0 text-dark fw-bold">Painel Financeiro</h2>
             <div>
-                <a href="{{ route('finance.invoice-campaigns.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm me-2">
+                <a href="{{ route('finance.invoice.campaigns.index') }}"
+                    class="btn btn-outline-secondary fw-bold shadow-sm me-2">
                     <i class="bi bi-list-task me-1"></i> Campanhas (Mala Direta)
                 </a>
-                <form action="{{ route('finance.carnet.batch-generate') }}" method="POST" class="d-inline" onsubmit="return confirm('Isso gerará os carnês em lote e enviará e-mails em segundo plano para os alunos sem faturas. Continuar?');">
+                <form action="{{ route('finance.carnet.batch-generate') }}" method="POST" class="d-inline"
+                    onsubmit="return confirm('Isso gerará os carnês em lote e enviará e-mails em segundo plano para os alunos sem faturas. Continuar?');">
                     @csrf
                     <button type="submit" class="btn btn-primary fw-bold shadow-sm">
                         <i class="bi bi-file-earmark-plus me-1"></i> Gerar Lote e Mala Direta
@@ -20,11 +22,13 @@
         <div class="row g-4 mb-4">
             <!-- Total Pendente / Atrasado -->
             <div class="col-md-6 col-lg-4">
-                <div class="glass-card p-4 border-start border-warning border-4 h-100 position-relative overflow-hidden">
+                <div
+                    class="glass-card p-4 border-start border-warning border-4 h-100 position-relative overflow-hidden">
                     <div class="position-absolute top-0 end-0 p-3 opacity-25">
                         <i class="bi bi-exclamation-triangle-fill fs-1 text-warning"></i>
                     </div>
-                    <h6 class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Inadimplência / Pendente</h6>
+                    <h6 class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">
+                        Inadimplência / Pendente</h6>
                     <h3 class="fw-bold text-dark mb-0">R$ {{ number_format($totalPending, 2, ',', '.') }}</h3>
                     <div class="small text-muted mt-2">Soma de todas as faturas não pagas</div>
                 </div>
@@ -32,13 +36,16 @@
 
             <!-- Total Recebido no Mês -->
             <div class="col-md-6 col-lg-4">
-                <div class="glass-card p-4 border-start border-success border-4 h-100 position-relative overflow-hidden">
+                <div
+                    class="glass-card p-4 border-start border-success border-4 h-100 position-relative overflow-hidden">
                     <div class="position-absolute top-0 end-0 p-3 opacity-25">
                         <i class="bi bi-cash-stack fs-1 text-success"></i>
                     </div>
-                    <h6 class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Receita do Mês</h6>
+                    <h6 class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">
+                        Receita do Mês</h6>
                     <h3 class="fw-bold text-success mb-0">R$ {{ number_format($totalReceived, 2, ',', '.') }}</h3>
-                    <div class="small text-muted mt-2">Pagamentos liquidados em {{ now()->translatedFormat('F/Y') }}</div>
+                    <div class="small text-muted mt-2">Pagamentos liquidados em {{ now()->translatedFormat('F/Y') }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -47,7 +54,7 @@
         <div class="glass-card p-0 overflow-hidden">
             <div class="p-4 bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-receipt me-2"></i> Mensalidades e Cobranças</h5>
-                
+
                 <div class="d-flex gap-2">
                     <select id="filterStatus" class="form-select form-select-sm" style="width: auto;">
                         <option value="">Todos os Status</option>
@@ -55,7 +62,7 @@
                         <option value="paid">Pago</option>
                         <option value="cancelled">Cancelado</option>
                     </select>
-                    
+
                     <select id="filterBank" class="form-select form-select-sm" style="width: auto;">
                         <option value="">Todos os Bancos</option>
                         @foreach($bankAccounts as $bank)
@@ -74,40 +81,40 @@
                         ['name' => 'actions', 'label' => 'Pagamento', 'orderable' => false, 'searchable' => false]
                     ];
                 @endphp
-                
+
                 <x-datatable id="invoicesTable" url="{{ route('finance.invoices.index') }}" :columns="$columns" />
             </div>
         </div>
     </div>
-    
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // A X-Datatable escuta os filtros se passarmos o table.ajax.reload()
-            // Vamos fazer um pequeno ajuste no Datatable
-            const statusFilter = document.getElementById('filterStatus');
-            const bankFilter = document.getElementById('filterBank');
-            
-            function reloadTable() {
-                if (window.LaravelDataTables && window.LaravelDataTables["invoicesTable"]) {
-                    let table = window.LaravelDataTables["invoicesTable"];
-                    table.on('preXhr.dt', function (e, settings, data) {
-                        data.status = statusFilter.value;
-                        data.bank_account_id = bankFilter.value;
-                    });
-                    table.ajax.reload();
-                } else {
-                    // Fallback para reinicialização simples do jQuery se o script principal carregar depois
-                    setTimeout(reloadTable, 500);
-                }
-            }
 
-            statusFilter.addEventListener('change', reloadTable);
-            bankFilter.addEventListener('change', reloadTable);
-            
-            // Hook initial load
-            setTimeout(reloadTable, 100);
-        });
-    </script>
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // A X-Datatable escuta os filtros se passarmos o table.ajax.reload()
+                // Vamos fazer um pequeno ajuste no Datatable
+                const statusFilter = document.getElementById('filterStatus');
+                const bankFilter = document.getElementById('filterBank');
+
+                function reloadTable() {
+                    if (window.LaravelDataTables && window.LaravelDataTables["invoicesTable"]) {
+                        let table = window.LaravelDataTables["invoicesTable"];
+                        table.on('preXhr.dt', function (e, settings, data) {
+                            data.status = statusFilter.value;
+                            data.bank_account_id = bankFilter.value;
+                        });
+                        table.ajax.reload();
+                    } else {
+                        // Fallback para reinicialização simples do jQuery se o script principal carregar depois
+                        setTimeout(reloadTable, 500);
+                    }
+                }
+
+                statusFilter.addEventListener('change', reloadTable);
+                bankFilter.addEventListener('change', reloadTable);
+
+                // Hook initial load
+                setTimeout(reloadTable, 100);
+            });
+        </script>
     @endpush
 </x-app-layout>

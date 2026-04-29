@@ -116,6 +116,6 @@ class CarnetController extends Controller
         // Despachar Job Principal
         \App\Jobs\Finance\ProcessInvoiceBatchJob::dispatch($campaign, $unitId, $bankAccount->id);
 
-        return redirect()->route('finance.invoice-campaigns.index')->with('success', 'O processamento em lote foi iniciado em segundo plano! Acompanhe o progresso da Mala Direta abaixo.');
+        return redirect()->route('finance.invoice.campaigns.index')->with('success', 'O processamento em lote foi iniciado em segundo plano! Acompanhe o progresso da Mala Direta abaixo.');
     }
 }

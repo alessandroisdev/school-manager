@@ -36,7 +36,7 @@ class InvoiceCampaignController extends Controller
                     </div>';
                 })
                 ->addColumn('actions', function($campaign) {
-                    $showUrl = route('finance.invoice-campaigns.show', $campaign);
+                    $showUrl = route('finance.invoice.campaigns.show', $campaign);
                     $actions = '<a href="'.$showUrl.'" class="btn btn-sm btn-outline-primary shadow-sm fw-bold"><i class="bi bi-eye me-1"></i> Detalhes</a>';
                     
                     if ($campaign->status === 'completed' && $campaign->zip_path) {
@@ -50,7 +50,7 @@ class InvoiceCampaignController extends Controller
                 ->make(true);
         }
 
-        return view('finance.invoice-campaigns.index');
+        return view('finance.invoice.campaigns.index');
     }
 
     public function show(Request $request, InvoiceCampaign $invoiceCampaign)
@@ -86,7 +86,7 @@ class InvoiceCampaignController extends Controller
             'pending' => $invoiceCampaign->items()->where('status', 'pending')->count(),
         ];
 
-        return view('finance.invoice-campaigns.show', compact('invoiceCampaign', 'stats'));
+        return view('finance.invoice.campaigns.show', compact('invoiceCampaign', 'stats'));
     }
 
     public function retry(InvoiceCampaign $invoiceCampaign)

@@ -81,12 +81,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.document-partials.index') }}" class="nav-link {{ request()->routeIs('admin.document-partials.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.partials.index') }}" class="nav-link {{ request()->routeIs('admin.partials.*') ? 'active' : '' }}">
                         <i class="bi bi-layout-text-window-reverse me-2"></i> Blocos Comuns
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.document-templates.index') }}" class="nav-link {{ request()->routeIs('admin.document-templates.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.templates.index') }}" class="nav-link {{ request()->routeIs('admin.templates.*') ? 'active' : '' }}">
                         <i class="bi bi-file-earmark-richtext me-2"></i> Templates (Contratos)
                     </a>
                 </li>
@@ -109,7 +109,7 @@
                 </li>
                 
                 <li>
-                    <a href="{{ route('admin.official-documents.index') }}" class="nav-link {{ request()->routeIs('admin.official-documents.*') || request()->routeIs('admin.official-categories.*') || request()->routeIs('admin.official-signers.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.documents.index') }}" class="nav-link {{ request()->routeIs('admin.documents.*') || request()->routeIs('admin.official-categories.*') || request()->routeIs('admin.official-signers.*') ? 'active' : '' }}">
                         <i class="bi bi-bank2 me-2"></i> Comunicação Oficial
                     </a>
                 </li>
@@ -191,12 +191,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('finance.bank-accounts.index') }}" class="nav-link {{ request()->routeIs('finance.bank-accounts.*') ? 'active' : '' }}">
+                    <a href="{{ route('finance.accounts.index') }}" class="nav-link {{ request()->routeIs('finance.accounts.*') ? 'active' : '' }}">
                         <i class="bi bi-bank me-2"></i> Contas Bancárias
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('finance.class-pricings.index') }}" class="nav-link {{ request()->routeIs('finance.class-pricings.*') ? 'active' : '' }}">
+                    <a href="{{ route('finance.pricings.index') }}" class="nav-link {{ request()->routeIs('finance.pricings.*') ? 'active' : '' }}">
                         <i class="bi bi-tags me-2"></i> Precificação de Turmas
                     </a>
                 </li>

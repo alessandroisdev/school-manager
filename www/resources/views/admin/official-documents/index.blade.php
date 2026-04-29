@@ -7,10 +7,12 @@
             </div>
             <div>
                 <!-- Links auxiliares caso as rotas não tenham sidebar dedicada -->
-                <a href="{{ route('admin.official-categories.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm me-2">Categorias</a>
-                <a href="{{ route('admin.official-signers.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm me-2">Assinaturas</a>
-                
-                <a href="{{ route('admin.official-documents.create') }}" class="btn btn-primary fw-bold shadow-sm">
+                <a href="{{ route('admin.official-categories.index') }}"
+                    class="btn btn-outline-secondary fw-bold shadow-sm me-2">Categorias</a>
+                <a href="{{ route('admin.official-signers.index') }}"
+                    class="btn btn-outline-secondary fw-bold shadow-sm me-2">Assinaturas</a>
+
+                <a href="{{ route('admin.documents.create') }}" class="btn btn-primary fw-bold shadow-sm">
                     <i class="bi bi-plus-lg me-1"></i> Redigir Ofício
                 </a>
             </div>
@@ -25,8 +27,8 @@
                     ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
                 ];
             @endphp
-            
-            <x-datatable id="officialDocsTable" url="{{ route('admin.official-documents.index') }}" :columns="$columns" />
+
+            <x-datatable id="officialDocsTable" url="{{ route('admin.documents.index') }}" :columns="$columns" />
         </div>
     </div>
 </x-app-layout>
