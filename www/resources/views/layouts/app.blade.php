@@ -5,9 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'SGE') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <script>
+        const storedTheme = localStorage.getItem('theme');
+        const getPreferredTheme = () => {
+            if (storedTheme) return storedTheme;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+        document.documentElement.setAttribute('data-bs-theme', getPreferredTheme() === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : getPreferredTheme());
+    </script>
     @vite(['resources/css/app.scss', 'resources/js/app.ts'])
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bs-body-bg); }
         .sidebar { height: 100vh; max-height: 100vh; background-color: #1e293b; color: #fff; width: 280px; transition: all 0.3s; display: flex; flex-direction: column; overflow: hidden; }
         .sidebar-scrollable { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding-right: 5px; }
         
@@ -30,8 +38,11 @@
 </head>
 <body class="d-flex overflow-hidden">
     
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar p-3 d-flex flex-column shadow">
+    <aside class="sidebar p-3 d-flex flex-column shadow" id="mainSidebar">
         <a href="{{ route('dashboard') }}" class="d-flex align-items-center mb-4 text-decoration-none px-3 mt-2">
             <i class="bi bi-hexagon-fill fs-3 text-primary me-2"></i>
             <span class="sidebar-brand">SGE ERP</span>
@@ -207,11 +218,16 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content w-100">
         <!-- Topbar -->
-        <header class="topbar d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <h5 class="mb-0 text-dark fw-bold text-muted me-3"><i class="bi bi-buildings me-2"></i> Unidade de Ensino:</h5>
+        <header class="topbar d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-outline-secondary d-lg-none" id="sidebarToggle">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <div class="d-flex align-items-center d-none d-md-flex">
+                    <h5 class="mb-0 fw-bold text-muted me-3"><i class="bi bi-buildings me-2"></i> Unidade:</h5>
+                </div>
                 @php
                     $availableUnits = auth()->user()->hasRole('admin') ? \App\Domains\Shared\Models\Unit::all() : auth()->user()->units;
                     $currentUnitName = $availableUnits->firstWhere('id', session('active_unit_id'))?->name ?? 'Selecione a Unidade';
@@ -243,8 +259,36 @@
                 @endif
             </div>
             
-            <div class="d-flex align-items-center">
-                <!-- Outros elementos do Topbar, como notificações, etc. -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Theme Switcher -->
+                <div class="dropdown bd-mode-toggle">
+                    <button class="btn btn-light py-2 dropdown-toggle d-flex align-items-center border-0 shadow-sm"
+                            id="bd-theme"
+                            type="button"
+                            aria-expanded="false"
+                            data-bs-toggle="dropdown"
+                            aria-label="Toggle theme (auto)">
+                        <i class="bi bi-circle-half my-1 theme-icon-active"></i>
+                        <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                <i class="bi bi-sun-fill me-2 opacity-50"></i> Claro
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                <i class="bi bi-moon-stars-fill me-2 opacity-50"></i> Escuro
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+                                <i class="bi bi-circle-half me-2 opacity-50"></i> Auto
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </header>
 
@@ -254,6 +298,23 @@
     
     <script type="module">
         document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar Mobile Toggle
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('mainSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            if (sidebarToggle && sidebar && sidebarOverlay) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.add('show');
+                    sidebarOverlay.classList.add('show');
+                });
+
+                sidebarOverlay.addEventListener('click', () => {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                });
+            }
+
             @if (session('success'))
                 window.Toast.fire({
                     icon: 'success',

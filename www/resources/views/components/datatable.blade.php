@@ -42,8 +42,8 @@
                 // Bootstrap tweaks post-draw
                 $('.dataTables_paginate .paginate_button').addClass('btn btn-sm btn-outline-secondary ms-1');
                 $('.dataTables_paginate .paginate_button.current').addClass('active').removeClass('btn-outline-secondary').addClass('btn-primary');
-                $('.dataTables_filter input').addClass('form-control form-control-sm d-inline-block w-auto ms-2 border-0 bg-light');
-                $('.dataTables_length select').addClass('form-select form-select-sm d-inline-block w-auto mx-2 border-0 bg-light');
+                $('.dataTables_filter input').addClass('form-control form-control-sm d-inline-block w-auto ms-2 border-0 bg-body-tertiary');
+                $('.dataTables_length select').addClass('form-select form-select-sm d-inline-block w-auto mx-2 border-0 bg-body-tertiary');
             }
         });
     });

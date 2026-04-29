@@ -14,9 +14,88 @@ body {
 }
 
 // Custom theme adjustments
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bs-body-bg: #121212;
-    --bs-body-color: #e0e0e0;
+[data-bs-theme="dark"] {
+  --bs-body-bg: #0f172a;
+  --bs-body-color: #cbd5e1;
+  
+  .glass-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
   }
+  
+  .topbar {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  
+  .sidebar {
+    background-color: #0b0f19 !important;
+  }
+  
+  /* DataTable overrides for dark mode */
+  .dataTables_wrapper {
+    color: #cbd5e1 !important;
+  }
+  table.dataTable tbody tr {
+    background-color: #1e293b !important;
+  }
+  table.dataTable tbody tr:hover {
+    background-color: #334155 !important;
+  }
+  table.dataTable.display > tbody > tr.odd > * {
+    box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.02) !important;
+  }
+  .dataTables_info, .dataTables_length, .dataTables_filter {
+    color: #cbd5e1 !important;
+  }
+  table.dataTable thead th, table.dataTable tfoot th {
+    color: #f8fafc !important;
+    border-bottom: 1px solid #334155 !important;
+  }
+  table.dataTable.no-footer {
+    border-bottom: 1px solid #334155 !important;
+  }
+  table.dataTable th, table.dataTable td {
+    border-color: #334155 !important;
+  }
+  
+  /* Global overrrides for hardcoded Bootstrap classes */
+  .text-dark {
+    color: #f8fafc !important;
+  }
+  .bg-light {
+    background-color: #1e293b !important;
+  }
+  .table-light {
+    --bs-table-bg: #334155 !important;
+    --bs-table-color: #cbd5e1 !important;
+  }
+}
+
+// Sidebar Mobile Responsiveness
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 1040;
+    backdrop-filter: blur(3px);
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        z-index: 1045;
+        transition: left 0.3s ease-in-out;
+    }
+    .sidebar.show {
+        left: 0;
+    }
+    .sidebar-overlay.show {
+        display: block;
+    }
 }

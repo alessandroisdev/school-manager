@@ -72,3 +72,68 @@ document.addEventListener('submit', function(e) {
         });
     }
 });
+
+// Theme Manager
+const getStoredTheme = () => localStorage.getItem('theme');
+const setStoredTheme = (theme: string) => localStorage.setItem('theme', theme);
+
+const getPreferredTheme = () => {
+    const storedTheme = getStoredTheme();
+    if (storedTheme) {
+        return storedTheme;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+const setTheme = (theme: string) => {
+    if (theme === 'auto') {
+        document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    } else {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+    }
+};
+
+setTheme(getPreferredTheme());
+
+const showActiveTheme = (theme: string) => {
+    const themeSwitcherText = document.querySelector('#bd-theme-text');
+    const activeThemeIcon = document.querySelector('.theme-icon-active');
+    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`);
+    
+    document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+        element.classList.remove('active');
+        element.setAttribute('aria-pressed', 'false');
+    });
+
+    if (btnToActive) {
+        btnToActive.classList.add('active');
+        btnToActive.setAttribute('aria-pressed', 'true');
+        const iconOfActiveBtn = btnToActive.querySelector('i')?.className;
+        if (activeThemeIcon && iconOfActiveBtn) {
+            activeThemeIcon.className = iconOfActiveBtn + ' theme-icon-active';
+        }
+    }
+};
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const storedTheme = getStoredTheme();
+    if (storedTheme !== 'light' && storedTheme !== 'dark') {
+        setTheme(getPreferredTheme());
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    showActiveTheme(getStoredTheme() || 'auto');
+
+    document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const theme = toggle.getAttribute('data-bs-theme-value');
+            if (theme) {
+                setStoredTheme(theme);
+                setTheme(theme);
+                showActiveTheme(theme);
+            }
+        });
+    });
+});
