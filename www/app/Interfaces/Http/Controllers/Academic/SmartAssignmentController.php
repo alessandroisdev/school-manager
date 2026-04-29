@@ -57,7 +57,7 @@ class SmartAssignmentController extends Controller
         }
 
         // Pega limite padrao das configuracoes se a turma nao tiver
-        $defaultCapacity = UnitSetting::where('unit_id', $unitId)->where('key', 'default_class_capacity')->value('value') ?? 30;
+        $defaultCapacity = UnitSetting::where('unit_id', $unitId)->value('default_class_capacity') ?? 30;
 
         $logs = [];
         $enrolledCount = 0;

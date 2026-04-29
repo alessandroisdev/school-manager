@@ -8,7 +8,7 @@
     @vite(['resources/css/app.scss', 'resources/js/app.ts'])
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .sidebar { min-height: 100vh; background-color: #1e293b; color: #fff; width: 280px; transition: all 0.3s; display: flex; flex-direction: column; }
+        .sidebar { height: 100vh; max-height: 100vh; background-color: #1e293b; color: #fff; width: 280px; transition: all 0.3s; display: flex; flex-direction: column; overflow: hidden; }
         .sidebar-scrollable { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding-right: 5px; }
         .sidebar-scrollable::-webkit-scrollbar { width: 6px; }
         .sidebar-scrollable::-webkit-scrollbar-track { background: transparent; }
@@ -164,8 +164,10 @@
                 <strong>{{ Auth::user()->name }}</strong>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow w-100" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i> Configurações</a></li>
+                @if(auth()->user()->hasRole('admin'))
+                <li><a class="dropdown-item" href="{{ route('admin.settings.index') }}"><i class="bi bi-gear me-2"></i> Configurações</a></li>
                 <li><hr class="dropdown-divider"></li>
+                @endif
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -182,19 +184,25 @@
         <header class="topbar d-flex justify-content-between align-items-center">
             <h5 class="mb-0 text-dark fw-bold text-muted"><i class="bi bi-buildings me-2"></i> Unidade de Ensino</h5>
             <div class="d-flex align-items-center">
-                @if(Auth::user()->units->count() > 1)
+                @php
+                    $availableUnits = auth()->user()->hasRole('admin') ? \App\Domains\Shared\Models\Unit::all() : auth()->user()->units;
+                @endphp
+                
+                @if($availableUnits->count() > 1)
                     <form method="POST" action="{{ route('context.switch') }}" class="m-0">
                         @csrf
-                        <select name="unit_id" onchange="this.form.submit()" class="form-select form-select-sm border-0 bg-primary bg-opacity-10 fw-bold text-primary rounded-pill px-4 py-2 cursor-pointer shadow-sm">
-                            @foreach(Auth::user()->units as $unit)
+                        <select name="unit_id" onchange="this.form.submit()" class="form-select form-select-sm border-0 bg-primary bg-opacity-10 fw-bold text-primary rounded-pill px-4 py-2 cursor-pointer shadow-sm" style="appearance: auto; padding-right: 2.5rem;">
+                            @foreach($availableUnits as $unit)
                                 <option value="{{ $unit->id }}" {{ session('active_unit_id') == $unit->id ? 'selected' : '' }}>
                                     {{ $unit->name }}
                                 </option>
                             @endforeach
                         </select>
                     </form>
-                @elseif(Auth::user()->units->count() == 1)
-                    <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-4 py-2 fs-6 shadow-sm border border-primary border-opacity-25">{{ Auth::user()->units->first()->name }}</span>
+                @elseif($availableUnits->count() == 1)
+                    <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-4 py-2 fs-6 shadow-sm border border-primary border-opacity-25">{{ $availableUnits->first()->name }}</span>
+                @else
+                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-4 py-2 fs-6 shadow-sm">Sem Vínculo</span>
                 @endif
             </div>
         </header>

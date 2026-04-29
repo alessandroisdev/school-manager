@@ -12,6 +12,10 @@ class UnitSetting extends Model
         'calculation_rule',
         'passing_grade',
         'passing_attendance',
+        'default_class_capacity',
+        'current_academic_year',
+        'default_due_day',
+        'late_fee_interest',
     ];
 
     protected function casts(): array

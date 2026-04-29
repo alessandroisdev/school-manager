@@ -17,23 +17,23 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-muted small">Máximo de Alunos por Turma (Default) *</label>
-                        <input type="number" name="settings[default_class_capacity]" class="form-control bg-light border-0" value="{{ $settings['default_class_capacity'] ?? 30 }}" required>
+                        <input type="number" name="settings[default_class_capacity]" class="form-control bg-light border-0" value="{{ $settings->default_class_capacity ?? 30 }}" required>
                         <div class="form-text small">Limita a enturmação automática e manual.</div>
                     </div>
                     
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-muted small">Nota Média de Aprovação *</label>
-                        <input type="number" step="0.1" name="settings[passing_grade]" class="form-control bg-light border-0" value="{{ $settings['passing_grade'] ?? 6.0 }}" required>
+                        <input type="number" step="0.1" name="settings[passing_grade]" class="form-control bg-light border-0" value="{{ $settings->passing_grade ?? 6.0 }}" required>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-muted small">Frequência Mínima para Aprovação (%) *</label>
-                        <input type="number" name="settings[minimum_attendance_percent]" class="form-control bg-light border-0" value="{{ $settings['minimum_attendance_percent'] ?? 75 }}" required>
+                        <input type="number" name="settings[passing_attendance]" class="form-control bg-light border-0" value="{{ $settings->passing_attendance ?? 75 }}" required>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-muted small">Ano Letivo Corrente *</label>
-                        <input type="number" name="settings[current_academic_year]" class="form-control bg-light border-0" value="{{ $settings['current_academic_year'] ?? date('Y') }}" required>
+                        <input type="number" name="settings[current_academic_year]" class="form-control bg-light border-0" value="{{ $settings->current_academic_year ?? date('Y') }}" required>
                     </div>
                 </div>
 
@@ -44,12 +44,12 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-muted small">Dia Padrão de Vencimento *</label>
-                        <input type="number" name="settings[default_due_day]" class="form-control bg-light border-0" value="{{ $settings['default_due_day'] ?? 10 }}" min="1" max="28" required>
+                        <input type="number" name="settings[default_due_day]" class="form-control bg-light border-0" value="{{ $settings->default_due_day ?? 10 }}" min="1" max="28" required>
                     </div>
                     
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-muted small">Juros por Atraso (%) ao mês</label>
-                        <input type="number" step="0.1" name="settings[late_fee_interest]" class="form-control bg-light border-0" value="{{ $settings['late_fee_interest'] ?? 2.0 }}">
+                        <input type="number" step="0.1" name="settings[late_fee_interest]" class="form-control bg-light border-0" value="{{ $settings->late_fee_interest ?? 2.0 }}">
                     </div>
                 </div>
 
