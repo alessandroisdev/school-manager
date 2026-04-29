@@ -22,6 +22,7 @@ class Student extends Model implements AuditableContract
         'unit_id',
         'user_id',
         'name',
+        'registration',
         'document',
         'birth_date',
         'gender',

@@ -61,6 +61,34 @@
                         </div>
                     </div>
 
+                    <!-- Dados do Responsável -->
+                    <div class="glass-card p-4 mb-4 border-success border-opacity-25">
+                        <h5 class="fw-bold mb-4 text-success"><i class="bi bi-people-fill me-2"></i> Dados do Responsável (Acesso ao Portal)</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="guardian_name" class="form-label fw-bold text-muted small">Nome Completo *</label>
+                                <input type="text" name="guardian_name" id="guardian_name" class="form-control bg-light border-0 @error('guardian_name') is-invalid @enderror" value="{{ old('guardian_name') }}" required>
+                                @error('guardian_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="guardian_document" class="form-label fw-bold text-muted small">CPF * (Será a senha de acesso)</label>
+                                <input type="text" name="guardian_document" id="guardian_document" class="form-control bg-light border-0 @error('guardian_document') is-invalid @enderror" value="{{ old('guardian_document') }}" required placeholder="000.000.000-00">
+                                @error('guardian_document')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="guardian_phone" class="form-label fw-bold text-muted small">Telefone / WhatsApp *</label>
+                                <input type="text" name="guardian_phone" id="guardian_phone" class="form-control bg-light border-0 @error('guardian_phone') is-invalid @enderror" value="{{ old('guardian_phone') }}" required>
+                                @error('guardian_phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="guardian_email" class="form-label fw-bold text-muted small">E-mail</label>
+                                <input type="email" name="guardian_email" id="guardian_email" class="form-control bg-light border-0 @error('guardian_email') is-invalid @enderror" value="{{ old('guardian_email') }}">
+                                @error('guardian_email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Endereço -->
                     <div class="glass-card p-4">
                         <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-geo-alt me-2"></i> Endereço Residencial</h5>

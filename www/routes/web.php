@@ -9,8 +9,15 @@ Route::get('/', [\App\Interfaces\Http\Controllers\PublicController::class, 'inde
 Route::post('/lead/store', [\App\Interfaces\Http\Controllers\PublicController::class, 'storeLead'])->name('public.lead.store');
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'authenticate']);
+    Route::get('/login/aluno', [\App\Interfaces\Http\Controllers\Auth\RoleAuthController::class, 'showStudentLogin'])->name('login.student');
+    Route::get('/login/responsavel', [\App\Interfaces\Http\Controllers\Auth\RoleAuthController::class, 'showParentLogin'])->name('login.parent');
+    Route::get('/login/professor', [\App\Interfaces\Http\Controllers\Auth\RoleAuthController::class, 'showTeacherLogin'])->name('login.teacher');
+    Route::get('/login/admin', [\App\Interfaces\Http\Controllers\Auth\RoleAuthController::class, 'showAdminLogin'])->name('login.admin');
+    
+    Route::post('/login/{role}', [\App\Interfaces\Http\Controllers\Auth\RoleAuthController::class, 'authenticate'])->name('login.attempt');
+    
+    // Redirect /login to /login/admin or / for safety
+    Route::get('/login', function() { return redirect()->route('login.admin'); })->name('login');
 });
 
 Route::middleware('auth')->group(function () {

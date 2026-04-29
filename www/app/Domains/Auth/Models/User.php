@@ -19,6 +19,7 @@ class User extends Authenticatable implements AuditableContract
 
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'is_active',

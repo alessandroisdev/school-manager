@@ -98,13 +98,73 @@ class StudentController extends Controller
             'address_city' => 'nullable|string|max:255',
             'address_state' => 'nullable|string|max:2',
             'status' => 'nullable|string|in:active,inactive,transferred',
+            'guardian_name' => 'required|string|max:255',
+            'guardian_document' => 'required|string|max:50',
+            'guardian_phone' => 'required|string|max:20',
+            'guardian_email' => 'nullable|email|max:255',
         ]);
 
-        $validated['unit_id'] = $unitId;
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $unitId) {
+            // 1. Generate Registration (Matricula)
+            $registration = date('Y') . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
-        Student::create($validated);
+            // 2. Create Student User
+            $studentUser = \App\Domains\Auth\Models\User::create([
+                'name' => $validated['name'],
+                'username' => $registration,
+                'email' => $validated['email'],
+                'password' => \Illuminate\Support\Facades\Hash::make($validated['document']),
+            ]);
+            $studentUser->units()->attach($unitId);
+            $studentRole = \App\Domains\Auth\Models\Role::firstOrCreate(['name' => 'aluno']);
+            $studentUser->roles()->attach($studentRole->id);
 
-        return redirect()->route('students.index')->with('success', 'Aluno cadastrado com sucesso!');
+            // 3. Create Student
+            $student = Student::create(array_merge(
+                \Illuminate\Support\Arr::except($validated, ['guardian_name', 'guardian_document', 'guardian_phone', 'guardian_email']),
+                [
+                    'unit_id' => $unitId,
+                    'user_id' => $studentUser->id,
+                    'registration' => $registration,
+                ]
+            ));
+
+            // 4. Create Guardian User
+            $guardianUser = \App\Domains\Auth\Models\User::firstOrCreate(
+                ['username' => $validated['guardian_document']],
+                [
+                    'name' => $validated['guardian_name'],
+                    'email' => $validated['guardian_email'],
+                    'password' => \Illuminate\Support\Facades\Hash::make($validated['guardian_document']),
+                ]
+            );
+            if (!$guardianUser->units->contains($unitId)) {
+                $guardianUser->units()->attach($unitId);
+            }
+            $guardianRole = \App\Domains\Auth\Models\Role::firstOrCreate(['name' => 'responsavel']);
+            if (!$guardianUser->roles->contains($guardianRole->id)) {
+                $guardianUser->roles()->attach($guardianRole->id);
+            }
+
+            // 5. Create/Find Guardian
+            $guardian = \App\Domains\Enrollment\Models\Guardian::firstOrCreate(
+                ['document' => $validated['guardian_document']],
+                [
+                    'user_id' => $guardianUser->id,
+                    'name' => $validated['guardian_name'],
+                    'phone' => $validated['guardian_phone'],
+                    'email' => $validated['guardian_email'],
+                ]
+            );
+
+            // 6. Link Guardian to Student
+            $student->guardians()->attach($guardian->id, ['relationship' => 'Responsável']);
+
+            // 7. Dispatch Event
+            event(new \App\Events\StudentEnrolledEvent($student, $registration, $validated['document']));
+        });
+
+        return redirect()->route('students.index')->with('success', 'Aluno e Responsável cadastrados com sucesso! Credenciais enviadas por e-mail.');
     }
 
     public function edit(Student $student)

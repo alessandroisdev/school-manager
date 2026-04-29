@@ -24,16 +24,16 @@ class TeacherAssignmentController extends Controller
             
             return \Yajra\DataTables\Facades\DataTables::of($query)
                 ->addColumn('teacher_name', function($assignment) {
-                    $employee = $assignment->teacher->employee;
-                    return '<div class="fw-bold text-info"><i class="bi bi-person-video3 me-1"></i> ' . $employee->name . '</div>';
+                    $employee = $assignment->teacher->employee ?? null;
+                    return '<div class="fw-bold text-info"><i class="bi bi-person-video3 me-1"></i> ' . ($employee->name ?? 'Professor Removido') . '</div>';
                 })
                 ->addColumn('class_info', function($assignment) {
                     $class = $assignment->schoolClass;
-                    return '<div class="fw-bold text-dark">' . $class->name . '</div>
-                            <div class="small text-muted">' . $class->grade->name . '</div>';
+                    return '<div class="fw-bold text-dark">' . ($class->name ?? 'N/A') . '</div>
+                            <div class="small text-muted">' . ($class->grade->name ?? 'Série Removida') . '</div>';
                 })
                 ->addColumn('subject_info', function($assignment) {
-                    return '<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1"><i class="bi bi-book-half me-1"></i> ' . $assignment->subject->name . '</span>';
+                    return '<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1"><i class="bi bi-book-half me-1"></i> ' . ($assignment->subject->name ?? 'Disciplina Removida') . '</span>';
                 })
                 ->addColumn('workload', function($assignment) {
                     return $assignment->assigned_workload . 'h';

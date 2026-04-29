@@ -22,13 +22,19 @@
                         @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="document" class="form-label fw-bold text-muted small">Documento (CPF/RG) *</label>
                         <input type="text" name="document" id="document" class="form-control bg-light border-0 @error('document') is-invalid @enderror" value="{{ old('document') }}" required>
                         @error('document')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label for="email" class="form-label fw-bold text-muted small">E-mail Corporativo *</label>
+                        <input type="email" name="email" id="email" class="form-control bg-light border-0 @error('email') is-invalid @enderror" value="{{ old('email') }}" required placeholder="professor@escola.com">
+                        @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="col-md-4">
                         <label for="specialty" class="form-label fw-bold text-muted small">Especialidade Principal</label>
                         <input type="text" name="specialty" id="specialty" class="form-control bg-light border-0 @error('specialty') is-invalid @enderror" value="{{ old('specialty') }}" placeholder="Ex: Matemática, Letras, Física">
                         @error('specialty')<div class="invalid-feedback">{{ $message }}</div>@enderror

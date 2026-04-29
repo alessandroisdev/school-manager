@@ -78,6 +78,7 @@ class TeacherController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'document' => 'required|string|max:50|unique:employees,document',
+            'email' => 'required|email|max:255|unique:users,email',
             'hire_date' => 'nullable|date',
             'specialty' => 'nullable|string|max:255',
             'max_workload' => 'required|integer|min:1|max:160',
@@ -85,6 +86,20 @@ class TeacherController extends Controller
         ]);
 
         DB::transaction(function() use ($validated, $unitId) {
+            // 1. Generate Teacher User
+            $password = \Illuminate\Support\Str::random(10);
+            $user = \App\Domains\Auth\Models\User::create([
+                'name' => $validated['name'],
+                'username' => $validated['document'],
+                'email' => $validated['email'],
+                'password' => \Illuminate\Support\Facades\Hash::make($password),
+                'is_active' => true,
+            ]);
+            $user->units()->attach($unitId);
+            $role = \App\Domains\Auth\Models\Role::firstOrCreate(['name' => 'professor']);
+            $user->roles()->attach($role->id);
+
+            // 2. Create Employee
             $employee = Employee::create([
                 'unit_id' => $unitId,
                 'name' => $validated['name'],
@@ -94,14 +109,18 @@ class TeacherController extends Controller
                 'is_active' => $validated['is_active'] ?? true,
             ]);
 
-            Teacher::create([
+            // 3. Create Teacher
+            $teacher = Teacher::create([
                 'employee_id' => $employee->id,
                 'specialty' => $validated['specialty'] ?? null,
                 'max_workload' => $validated['max_workload'],
             ]);
+
+            // 4. Dispatch Event
+            event(new \App\Events\TeacherRegisteredEvent($teacher, $validated['email'], $password));
         });
 
-        return redirect()->route('hr.teachers.index')->with('success', 'Professor cadastrado com sucesso!');
+        return redirect()->route('hr.teachers.index')->with('success', 'Professor cadastrado com sucesso! Credenciais enviadas por e-mail.');
     }
 
     public function edit(Teacher $teacher)

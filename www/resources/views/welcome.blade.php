@@ -49,8 +49,21 @@
             <a class="navbar-brand fw-bold fs-4" href="#">
                 <i class="bi bi-mortarboard-fill text-primary me-2"></i>SGE School
             </a>
-            <div class="d-flex">
-                <a href="{{ route('login') }}" class="btn btn-outline-light fw-bold px-4 rounded-pill">Área Restrita</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLogin" aria-controls="navbarLogin" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarLogin">
+                <ul class="navbar-nav mb-2 mb-lg-0 gap-2">
+                    <li class="nav-item">
+                        <a href="{{ route('login.student') }}" class="btn btn-outline-light fw-bold px-4 rounded-pill">Portal do Aluno</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('login.parent') }}" class="btn btn-outline-light fw-bold px-4 rounded-pill">Portal dos Pais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('login.teacher') }}" class="btn btn-primary fw-bold px-4 rounded-pill">Área do Professor</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -160,8 +173,17 @@
         </div>
     </section>
 
-    <footer class="bg-dark text-light py-4 text-center">
-        <p class="mb-0 small text-muted">&copy; {{ date('Y') }} SGE School Manager. Todos os direitos reservados.</p>
+    <footer class="bg-dark text-light py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0 text-center text-md-start">
+                    <p class="mb-0 small text-muted">&copy; {{ date('Y') }} SGE School Manager. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="{{ route('login.admin') }}" class="text-decoration-none text-muted small hover-primary"><i class="bi bi-shield-lock me-1"></i> Acesso Administrativo (Direção e Secretaria)</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
 </body>
