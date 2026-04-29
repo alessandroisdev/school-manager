@@ -137,6 +137,40 @@
                         </div>
                     </div>
 
+                    @if($activeEnrollment)
+                    <div class="glass-card p-4 mb-4 border-success border-opacity-25">
+                        <h5 class="fw-bold mb-4 text-success"><i class="bi bi-currency-dollar me-2"></i> Configurações Financeiras (Matrícula Ativa)</h5>
+                        
+                        <div class="alert alert-success bg-success bg-opacity-10 border-0 py-2 small mb-3">
+                            Configuração aplicável ao faturamento da turma <strong>{{ $activeEnrollment->schoolClass->name }}</strong>.
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bank_account_id" class="form-label fw-bold text-muted small">Banco Específico (Opcional)</label>
+                            <select name="bank_account_id" id="bank_account_id" class="form-select bg-light border-0">
+                                <option value="">Utilizar Banco Padrão da Escola</option>
+                                @foreach($bankAccounts as $bank)
+                                    <option value="{{ $bank->id }}" {{ old('bank_account_id', $activeEnrollment->bank_account_id) == $bank->id ? 'selected' : '' }}>
+                                        {{ $bank->name }} ({{ $bank->agency }} / {{ $bank->account_number }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="form-text small">Selecione apenas se o faturamento deste aluno for por outro banco.</div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label for="discount_percentage" class="form-label fw-bold text-muted small">Desconto / Bolsa (%)</label>
+                                <input type="number" step="0.01" min="0" max="100" name="discount_percentage" id="discount_percentage" class="form-control bg-light border-0" value="{{ old('discount_percentage', $activeEnrollment->discount_percentage) }}" placeholder="Ex: 10">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="discount_amount" class="form-label fw-bold text-muted small">Desconto Exato (R$)</label>
+                                <input type="number" step="0.01" min="0" name="discount_amount" id="discount_amount" class="form-control bg-light border-0" value="{{ old('discount_amount', $activeEnrollment->discount_amount) }}" placeholder="Ex: 50.00">
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
                             <i class="bi bi-check-circle me-2"></i> Atualizar Aluno

@@ -59,10 +59,19 @@
                 @forelse($reportCards as $report)
                     <div class="row g-4 mb-4">
                         <div class="col-12">
-                            <h5 class="fw-bold text-dark border-bottom pb-2 mb-0">
-                                <i class="bi bi-mortarboard me-2 text-primary"></i> 
-                                {{ $report['enrollment']->schoolClass->name }} 
-                                <span class="small text-muted fw-normal ms-2">({{ $report['enrollment']->schoolClass->grade->name }} / {{ $report['enrollment']->schoolClass->shift->name }})</span>
+                            <h5 class="fw-bold text-dark border-bottom pb-2 mb-0 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-mortarboard me-2 text-primary"></i> 
+                                    {{ $report['enrollment']->schoolClass->name }} 
+                                    <span class="small text-muted fw-normal ms-2">({{ $report['enrollment']->schoolClass->grade->name }} / {{ $report['enrollment']->schoolClass->shift->name }})</span>
+                                </div>
+                                @if(in_array($report['enrollment']->status, ['active', 'ativa']))
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 fs-6">Matrícula Ativa</span>
+                                @elseif(in_array($report['enrollment']->status, ['completed', 'concluida']))
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-1 fs-6">Ano Concluído</span>
+                                @else
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-1 fs-6">Transferido/Inativo</span>
+                                @endif
                             </h5>
                         </div>
 

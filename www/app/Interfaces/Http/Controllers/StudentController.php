@@ -169,7 +169,15 @@ class StudentController extends Controller
 
     public function edit(Student $student)
     {
-        return view('students.edit', compact('student'));
+        $activeEnrollment = \App\Domains\Enrollment\Models\Enrollment::with('schoolClass')
+            ->where('student_id', $student->id)
+            ->whereIn('status', ['active', 'ativa'])
+            ->latest()
+            ->first();
+            
+        $bankAccounts = \App\Domains\Finance\Models\BankAccount::where('unit_id', session('active_unit_id'))->get();
+        
+        return view('students.edit', compact('student', 'activeEnrollment', 'bankAccounts'));
     }
 
     public function update(Request $request, Student $student)
@@ -190,9 +198,36 @@ class StudentController extends Controller
             'address_city' => 'nullable|string|max:255',
             'address_state' => 'nullable|string|max:2',
             'status' => 'nullable|string|in:active,inactive,transferred',
+            
+            // Financial fields
+            'bank_account_id' => 'nullable|exists:bank_accounts,id',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
+            'discount_amount' => 'nullable|numeric|min:0',
         ]);
 
+        // Extrai os campos financeiros
+        $financialData = [
+            'bank_account_id' => $request->bank_account_id,
+            'discount_percentage' => $request->discount_percentage ?? 0,
+            'discount_amount' => $request->discount_amount ?? 0,
+        ];
+        
+        // Remove do array principal
+        unset($validated['bank_account_id']);
+        unset($validated['discount_percentage']);
+        unset($validated['discount_amount']);
+
         $student->update($validated);
+        
+        // Atualiza matrícula ativa, se existir
+        $activeEnrollment = \App\Domains\Enrollment\Models\Enrollment::where('student_id', $student->id)
+            ->whereIn('status', ['active', 'ativa'])
+            ->latest()
+            ->first();
+            
+        if ($activeEnrollment) {
+            $activeEnrollment->update($financialData);
+        }
 
         return redirect()->route('students.index')->with('success', 'Dados do aluno atualizados!');
     }
@@ -205,10 +240,10 @@ class StudentController extends Controller
 
     public function show(Student $student)
     {
-        // Carrega todas as matrículas ativas do aluno
+        // Carrega todas as matrículas do aluno (histórico completo)
         $enrollments = \App\Domains\Enrollment\Models\Enrollment::with(['schoolClass.grade', 'schoolClass.shift'])
             ->where('student_id', $student->id)
-            ->whereIn('status', ['active', 'ativa'])
+            ->orderBy('created_at', 'desc')
             ->get();
             
         // Estrutura para montar o Boletim (agrupado por Matrícula/Turma)
