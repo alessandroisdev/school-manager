@@ -51,21 +51,21 @@ Route::middleware('auth')->group(function () {
         Route::post('settings', [\App\Interfaces\Http\Controllers\Admin\SettingController::class, 'store'])->name('settings.store');
 
         // Upload genérico de Imagens (WYSIWYG)
-        Route::post('upload-image', [\App\Interfaces\Http\Controllers\Admin\UploadController::class, 'uploadImage'])->name('upload.image');
+        Route::post('upload/image', [\App\Interfaces\Http\Controllers\Admin\UploadController::class, 'uploadImage'])->name('upload.image');
 
         // Gestor de Documentos (Isolado por unidade)
-        Route::resource('document-partials', \App\Interfaces\Http\Controllers\Admin\DocumentPartialController::class)->except(['show']);
-        Route::get('document-templates/{document_template}/preview', [\App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class, 'previewPdf'])->name('document-templates.preview');
-        Route::resource('document-templates', \App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class)->except(['show']);
+        Route::resource('document/partials', \App\Interfaces\Http\Controllers\Admin\DocumentPartialController::class)->except(['show']);
+        Route::get('document/templates/{document_template}/preview', [\App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class, 'previewPdf'])->name('document.templates.preview');
+        Route::resource('document/templates', \App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class)->except(['show']);
         
         // Módulo de Comunicação Oficial
-        Route::resource('official-categories', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentCategoryController::class)->except(['show']);
-        Route::resource('official-signers', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentSignerController::class)->except(['show']);
+        Route::resource('official/categories', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentCategoryController::class)->except(['show']);
+        Route::resource('official/signers', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentSignerController::class)->except(['show']);
         
-        Route::post('official-documents/{official_document}/publish', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'publish'])->name('official-documents.publish');
-        Route::post('official-documents/{official_document}/cancel', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'cancel'])->name('official-documents.cancel');
-        Route::get('official-documents/{official_document}/pdf', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'generatePdf'])->name('official-documents.pdf');
-        Route::resource('official-documents', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class)->except(['show']);
+        Route::post('official/documents/{official_document}/publish', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'publish'])->name('official.documents.publish');
+        Route::post('official/documents/{official_document}/cancel', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'cancel'])->name('official.documents.cancel');
+        Route::get('official/documents/{official_document}/pdf', [\App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class, 'generatePdf'])->name('official.documents.pdf');
+        Route::resource('official/documents', \App\Interfaces\Http\Controllers\Admin\OfficialDocumentController::class)->except(['show']);
     });
 
     // Módulo Secretaria
@@ -79,10 +79,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('enrollments', \App\Interfaces\Http\Controllers\EnrollmentController::class)->except(['show', 'edit', 'update']);
         
         // Emissão e Gestão de Documentos do Aluno
-        Route::post('issued-documents', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'store'])->name('issued-documents.store');
-        Route::get('issued-documents/{issuedDocument}', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'show'])->name('issued-documents.show');
-        Route::post('issued-documents/{issuedDocument}/cancel', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'cancel'])->name('issued-documents.cancel');
-        Route::post('issued-documents/{issuedDocument}/rectify', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'rectify'])->name('issued-documents.rectify');
+        Route::post('issued/documents', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'store'])->name('issued.documents.store');
+        Route::get('issued/documents/{issuedDocument}', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'show'])->name('issued.documents.show');
+        Route::post('issued/documents/{issuedDocument}/cancel', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'cancel'])->name('issued.documents.cancel');
+        Route::post('issued/documents/{issuedDocument}/rectify', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'rectify'])->name('issued.documents.rectify');
 
         // Protocolo de Recebimento de Documentos
         Route::patch('protocols/{protocol}/status', [\App\Interfaces\Http\Controllers\Secretariat\ProtocolController::class, 'updateStatus'])->name('secretariat.protocols.update-status');
@@ -95,8 +95,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('academic')->name('academic.')->group(function () {
         
         // Smart Tools (IA)
-        Route::get('smart-tools', [\App\Interfaces\Http\Controllers\Academic\SmartAssignmentController::class, 'index'])->name('smart.index');
-        Route::post('smart-tools/auto-enroll', [\App\Interfaces\Http\Controllers\Academic\SmartAssignmentController::class, 'autoEnroll'])->name('smart.autoEnroll');
+        Route::get('smart/tools', [\App\Interfaces\Http\Controllers\Academic\SmartAssignmentController::class, 'index'])->name('smart.index');
+        Route::post('smart/tools/auto-enroll', [\App\Interfaces\Http\Controllers\Academic\SmartAssignmentController::class, 'autoEnroll'])->name('smart.autoEnroll');
 
         Route::resource('grades', \App\Interfaces\Http\Controllers\Academic\GradeController::class)->except(['show']);
         Route::resource('shifts', \App\Interfaces\Http\Controllers\Academic\ShiftController::class)->except(['show']);
@@ -135,20 +135,20 @@ Route::middleware('auth')->group(function () {
     // Módulo Financeiro
     Route::prefix('finance')->name('finance.')->group(function () {
         Route::post('carnet/generate', [\App\Interfaces\Http\Controllers\Finance\CarnetController::class, 'generate'])->name('carnet.generate');
-        Route::post('carnet/batch-generate', [\App\Interfaces\Http\Controllers\Finance\CarnetController::class, 'batchGenerate'])->name('carnet.batch-generate');
-        Route::get('boleto-print/{invoice}', [\App\Interfaces\Http\Controllers\Finance\BoletoController::class, 'show'])->name('boleto.show');
+        Route::post('carnet/batch/generate', [\App\Interfaces\Http\Controllers\Finance\CarnetController::class, 'batchGenerate'])->name('carnet.batch-generate');
+        Route::get('boleto/print/{invoice}', [\App\Interfaces\Http\Controllers\Finance\BoletoController::class, 'show'])->name('boleto.show');
         
         // Cadastros Financeiros (Apenas Admin/Direção)
-        Route::resource('bank-accounts', \App\Interfaces\Http\Controllers\Finance\BankAccountController::class);
-        Route::resource('class-pricings', \App\Interfaces\Http\Controllers\Finance\ClassPricingController::class);
+        Route::resource('bank/accounts', \App\Interfaces\Http\Controllers\Finance\BankAccountController::class);
+        Route::resource('class/pricings', \App\Interfaces\Http\Controllers\Finance\ClassPricingController::class);
 
         // Faturas e Pagamentos
         Route::get('invoices', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'index'])->name('invoices.index');
         Route::patch('invoices/{invoice}/pay', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'pay'])->name('invoices.pay');
 
         // Campanhas e Lotes
-        Route::get('invoice-campaigns', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'index'])->name('invoice-campaigns.index');
-        Route::get('invoice-campaigns/{invoiceCampaign}', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'show'])->name('invoice-campaigns.show');
-        Route::post('invoice-campaigns/{invoiceCampaign}/retry', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'retry'])->name('invoice-campaigns.retry');
+        Route::get('invoice/campaigns', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'index'])->name('invoice.campaigns.index');
+        Route::get('invoice/campaigns/{invoiceCampaign}', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'show'])->name('invoice.campaigns.show');
+        Route::post('invoice/campaigns/{invoiceCampaign}/retry', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'retry'])->name('invoice.campaigns.retry');
     });
 });
