@@ -88,73 +88,34 @@ class CarnetController extends Controller
     {
         $unitId = session('active_unit_id');
         
-        // Buscar Conta Bancária Padrão
-        $bankAccount = BankAccount::where('unit_id', $unitId)->where('is_active', true)->first();
+        // Buscar Conta Bancária Padrão (se existir)
+        $bankAccount = \App\Domains\Finance\Models\BankAccount::where('unit_id', $unitId)
+            ->where('is_active', true)
+            ->where('is_default', true)
+            ->first();
+            
+        if (!$bankAccount) {
+            // Se não tem padrão, pega qualquer uma ativa
+            $bankAccount = \App\Domains\Finance\Models\BankAccount::where('unit_id', $unitId)->where('is_active', true)->first();
+        }
+
         if (!$bankAccount) {
             return back()->with('warning', 'Nenhuma conta bancária configurada para emitir o boleto.');
         }
 
-        $unitSettings = UnitSetting::where('unit_id', $unitId)->first();
-        $startMonth = Carbon::now()->month;
-        $startYear = Carbon::now()->year;
+        // Criar Campanha de Mala Direta
+        $campaignName = 'Faturamento Lote - ' . \Carbon\Carbon::now()->format('m/Y');
+        $campaign = \App\Domains\Finance\Models\InvoiceCampaign::create([
+            'unit_id' => $unitId,
+            'name' => $campaignName,
+            'status' => 'pending',
+            'total_items' => 0,
+            'processed_items' => 0,
+        ]);
 
-        // Pega todos os alunos enturmados
-        $students = Student::where('unit_id', $unitId)
-            ->with(['enrollments' => function($q) {
-                $q->whereIn('status', ['active', 'ativa'])->with('schoolClass');
-            }])->get();
+        // Despachar Job Principal
+        \App\Jobs\Finance\ProcessInvoiceBatchJob::dispatch($campaign, $unitId, $bankAccount->id);
 
-        $generatedCount = 0;
-
-        DB::transaction(function() use ($students, $unitId, $bankAccount, $startMonth, $startYear) {
-            foreach ($students as $student) {
-                $enrollment = $student->enrollments->first();
-                if (!$enrollment) continue;
-
-                $class = $enrollment->schoolClass;
-                
-                // Buscar Precificação
-                $pricing = ClassPricing::where('unit_id', $unitId)
-                    ->where('grade_id', $class->grade_id)
-                    ->where('shift_id', $class->shift_id)
-                    ->first();
-
-                if (!$pricing) continue;
-
-                // Verifica se já existe carnê
-                $existing = Invoice::where('student_id', $student->id)
-                    ->where('enrollment_id', $enrollment->id)->exists();
-                
-                if ($existing) continue;
-
-                // Calcular parcelas
-                $installments = $pricing->installments_count > 0 ? $pricing->installments_count : 12;
-                $amountPerInstallment = round($pricing->annual_amount / $installments, 2);
-
-                for ($i = 1; $i <= $installments; $i++) {
-                    $dueDate = Carbon::create($startYear, $startMonth, 1)->addMonths($i - 1)->day($pricing->default_due_day);
-                    
-                    Invoice::create([
-                        'unit_id' => $unitId,
-                        'student_id' => $student->id,
-                        'enrollment_id' => $enrollment->id,
-                        'bank_account_id' => $bankAccount->id,
-                        'amount' => $amountPerInstallment,
-                        'installment_number' => $i,
-                        'due_date' => $dueDate,
-                        'status' => 'pending',
-                        'description' => "Mensalidade Escolar - Parcela {$i}/{$installments}",
-                    ]);
-                }
-                
-                $generatedCount++;
-            }
-        });
-
-        if ($generatedCount > 0) {
-            return back()->with('success', "Carnês gerados para {$generatedCount} aluno(s) com sucesso!");
-        } else {
-            return back()->with('info', 'Nenhum novo carnê foi gerado. Os alunos ativos já possuem carnês ou não há precificação cadastrada para as suas turmas.');
-        }
+        return redirect()->route('finance.invoice-campaigns.index')->with('success', 'O processamento em lote foi iniciado em segundo plano! Acompanhe o progresso da Mala Direta abaixo.');
     }
 }

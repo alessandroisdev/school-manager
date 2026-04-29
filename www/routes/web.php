@@ -141,5 +141,14 @@ Route::middleware('auth')->group(function () {
         // Cadastros Financeiros (Apenas Admin/Direção)
         Route::resource('bank-accounts', \App\Interfaces\Http\Controllers\Finance\BankAccountController::class);
         Route::resource('class-pricings', \App\Interfaces\Http\Controllers\Finance\ClassPricingController::class);
+
+        // Faturas e Pagamentos
+        Route::get('invoices', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::patch('invoices/{invoice}/pay', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'pay'])->name('invoices.pay');
+
+        // Campanhas e Lotes
+        Route::get('invoice-campaigns', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'index'])->name('invoice-campaigns.index');
+        Route::get('invoice-campaigns/{invoiceCampaign}', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'show'])->name('invoice-campaigns.show');
+        Route::post('invoice-campaigns/{invoiceCampaign}/retry', [\App\Interfaces\Http\Controllers\Finance\InvoiceCampaignController::class, 'retry'])->name('invoice-campaigns.retry');
     });
 });

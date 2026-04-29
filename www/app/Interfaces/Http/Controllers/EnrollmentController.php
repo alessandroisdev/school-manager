@@ -52,13 +52,15 @@ class EnrollmentController extends Controller
                     return '<span class="badge ' . $badgeClass . ' bg-opacity-10 rounded-pill px-3 py-2 border border-opacity-25 border-' . explode('-', $badgeClass)[0] . '">' . $statusName . '</span>';
                 })
                 ->addColumn('actions', function($enrollment) {
+                    $editUrl = route('enrollments.edit', $enrollment);
                     $deleteUrl = route('enrollments.destroy', $enrollment);
                     $csrf = csrf_field();
                     $method = method_field('DELETE');
 
                     return '
-                        <div class="text-end text-nowrap">
-                            <form action="' . $deleteUrl . '" method="POST" class="d-inline-block form-delete">
+                        <div class="d-flex gap-2 justify-content-end text-nowrap">
+                            <a href="' . $editUrl . '" class="btn btn-sm btn-outline-primary shadow-sm"><i class="bi bi-pencil"></i></a>
+                            <form action="' . $deleteUrl . '" method="POST" class="d-inline-block form-delete" onsubmit="return confirm(\'Realmente deseja cancelar esta matrícula?\');">
                                 ' . $csrf . $method . '
                                 <button type="submit" class="btn btn-sm btn-light text-danger fw-bold"><i class="bi bi-trash"></i> Cancelar Matrícula</button>
                             </form>
@@ -120,6 +122,28 @@ class EnrollmentController extends Controller
         Enrollment::create($validated);
 
         return redirect()->route('enrollments.index')->with('success', 'Matrícula efetuada com sucesso!');
+    }
+
+    public function edit(Enrollment $enrollment)
+    {
+        $bankAccounts = \App\Domains\Finance\Models\BankAccount::where('unit_id', session('active_unit_id'))->get();
+        return view('enrollments.edit', compact('enrollment', 'bankAccounts'));
+    }
+
+    public function update(Request $request, Enrollment $enrollment)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string',
+            'bank_account_id' => 'nullable|exists:bank_accounts,id',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
+        ]);
+
+        // Trata os valores em branco
+        $validated['discount_percentage'] = $validated['discount_percentage'] ?? 0;
+
+        $enrollment->update($validated);
+
+        return redirect()->route('enrollments.index')->with('success', 'Matrícula atualizada com sucesso!');
     }
 
     public function destroy(Enrollment $enrollment)

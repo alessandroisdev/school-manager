@@ -19,6 +19,14 @@ class InvoiceController extends Controller
                 ->where('unit_id', $unitId)
                 ->orderBy('due_date', 'asc');
                 
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->has('bank_account_id') && $request->bank_account_id != '') {
+                $query->where('bank_account_id', $request->bank_account_id);
+            }
+                
             return \Yajra\DataTables\Facades\DataTables::of($query)
                 ->addColumn('student_class', function($invoice) {
                     $className = $invoice->enrollment->schoolClass->name ?? 'Sem Turma';
@@ -69,7 +77,9 @@ class InvoiceController extends Controller
             ->whereMonth('paid_at', Carbon::now()->month)
             ->sum('amount');
 
-        return view('finance.invoices.index', compact('totalPending', 'totalReceived'));
+        $bankAccounts = \App\Domains\Finance\Models\BankAccount::where('unit_id', $unitId)->get();
+
+        return view('finance.invoices.index', compact('totalPending', 'totalReceived', 'bankAccounts'));
     }
 
     public function pay(Invoice $invoice)

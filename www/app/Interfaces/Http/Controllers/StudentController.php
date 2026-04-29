@@ -230,14 +230,14 @@ class StudentController extends Controller
                 $subject = $assignment->subject;
                 
                 // Soma de notas deste aluno nesta matéria, nesta turma
-                $totalScore = \App\Domains\Academic\Models\GradeEntry::where('student_id', $student->id)
+                $totalScore = \App\Domains\Evaluation\Models\GradeEntry::where('student_id', $student->id)
                     ->whereHas('evaluation', function($q) use ($classId, $subject) {
                         $q->where('school_class_id', $classId)
                           ->where('subject_id', $subject->id);
                     })->sum('score');
                     
                 // Faltas (status = falta)
-                $absences = \App\Domains\Academic\Models\AttendanceRecord::where('student_id', $student->id)
+                $absences = \App\Domains\Attendance\Models\AttendanceRecord::where('student_id', $student->id)
                     ->where('status', 'falta')
                     ->whereHas('lesson', function($q) use ($classId, $subject) {
                         $q->where('school_class_id', $classId)
@@ -245,7 +245,7 @@ class StudentController extends Controller
                     })->count();
                     
                 // Total de Aulas dadas dessa matéria
-                $lessonsCount = \App\Domains\Academic\Models\Lesson::where('school_class_id', $classId)
+                $lessonsCount = \App\Domains\Attendance\Models\Lesson::where('school_class_id', $classId)
                     ->where('subject_id', $subject->id)
                     ->count();
                     

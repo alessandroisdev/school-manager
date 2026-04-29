@@ -3,12 +3,17 @@
         
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h3 mb-0 text-dark fw-bold">Painel Financeiro</h2>
-            <form action="{{ route('finance.carnet.batch-generate') }}" method="POST" class="d-inline" onsubmit="return confirm('Isso gerará os carnês de todas as turmas que possuem Precificação cadastrada para todos os alunos ativos que ainda não possuem carnê. Deseja continuar?');">
-                @csrf
-                <button type="submit" class="btn btn-primary fw-bold shadow-sm">
-                    <i class="bi bi-file-earmark-plus me-1"></i> Gerar Faturas em Lote
-                </button>
-            </form>
+            <div>
+                <a href="{{ route('finance.invoice-campaigns.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm me-2">
+                    <i class="bi bi-list-task me-1"></i> Campanhas (Mala Direta)
+                </a>
+                <form action="{{ route('finance.carnet.batch-generate') }}" method="POST" class="d-inline" onsubmit="return confirm('Isso gerará os carnês em lote e enviará e-mails em segundo plano para os alunos sem faturas. Continuar?');">
+                    @csrf
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm">
+                        <i class="bi bi-file-earmark-plus me-1"></i> Gerar Lote e Mala Direta
+                    </button>
+                </form>
+            </div>
         </div>
 
         <!-- Indicadores Financeiros (Cards) -->
@@ -40,8 +45,24 @@
 
         <!-- Tabela de Faturas -->
         <div class="glass-card p-0 overflow-hidden">
-            <div class="p-4 bg-light border-bottom">
+            <div class="p-4 bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-receipt me-2"></i> Mensalidades e Cobranças</h5>
+                
+                <div class="d-flex gap-2">
+                    <select id="filterStatus" class="form-select form-select-sm" style="width: auto;">
+                        <option value="">Todos os Status</option>
+                        <option value="pending">Pendente/Atrasado</option>
+                        <option value="paid">Pago</option>
+                        <option value="cancelled">Cancelado</option>
+                    </select>
+                    
+                    <select id="filterBank" class="form-select form-select-sm" style="width: auto;">
+                        <option value="">Todos os Bancos</option>
+                        @foreach($bankAccounts as $bank)
+                            <option value="{{ $bank->id }}">{{ $bank->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="p-4">
                 @php
@@ -58,4 +79,35 @@
             </div>
         </div>
     </div>
+    
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // A X-Datatable escuta os filtros se passarmos o table.ajax.reload()
+            // Vamos fazer um pequeno ajuste no Datatable
+            const statusFilter = document.getElementById('filterStatus');
+            const bankFilter = document.getElementById('filterBank');
+            
+            function reloadTable() {
+                if (window.LaravelDataTables && window.LaravelDataTables["invoicesTable"]) {
+                    let table = window.LaravelDataTables["invoicesTable"];
+                    table.on('preXhr.dt', function (e, settings, data) {
+                        data.status = statusFilter.value;
+                        data.bank_account_id = bankFilter.value;
+                    });
+                    table.ajax.reload();
+                } else {
+                    // Fallback para reinicialização simples do jQuery se o script principal carregar depois
+                    setTimeout(reloadTable, 500);
+                }
+            }
+
+            statusFilter.addEventListener('change', reloadTable);
+            bankFilter.addEventListener('change', reloadTable);
+            
+            // Hook initial load
+            setTimeout(reloadTable, 100);
+        });
+    </script>
+    @endpush
 </x-app-layout>

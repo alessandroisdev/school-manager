@@ -19,6 +19,9 @@ class Enrollment extends Model implements AuditableContract
         'student_id',
         'school_class_id',
         'status',
+        'bank_account_id',
+        'discount_percentage',
+        'discount_amount',
     ];
 
     protected function casts(): array
@@ -36,5 +39,10 @@ class Enrollment extends Model implements AuditableContract
     public function schoolClass(): BelongsTo
     {
         return $this->belongsTo(SchoolClass::class);
+    }
+
+    public function bankAccount(): BelongsTo
+    {
+        return $this->belongsTo(\App\Domains\Finance\Models\BankAccount::class);
     }
 }

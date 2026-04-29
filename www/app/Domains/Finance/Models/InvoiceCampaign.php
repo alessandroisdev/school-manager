@@ -6,32 +6,28 @@ use App\Domains\Shared\Models\Unit;
 use App\Infrastructure\Persistence\Traits\HasUnitScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class BankAccount extends Model
+class InvoiceCampaign extends Model
 {
-    use HasUnitScope, SoftDeletes;
+    use HasUnitScope;
 
     protected $fillable = [
         'unit_id',
         'name',
-        'bank_code',
-        'agency',
-        'account',
-        'wallet',
-        'fine_percentage',
-        'interest_percentage',
-        'instruction_lines',
-        'is_active',
-        'is_default',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
+        'status', // pending, processing, completed, failed
+        'zip_path',
+        'total_items',
+        'processed_items',
     ];
 
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(InvoiceCampaignItem::class);
     }
 }
