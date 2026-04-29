@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: School Manager SaaS API
+  description: Enterprise-grade Multi-Tenant School Management Platform (ERP) API. This API provides access to global administration, pedagogical modules, financial systems, and public lead capture endpoints.
+  version: 1.0.0
+  contact:
+    name: SGE Development Team
+servers:
+  - url: http://localhost:8000/api
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PreEnrollment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        parent_name:
+          type: string
+          example: "João Silva"
+        phone:
+          type: string
+          example: "+55 11 99999-9999"
+        email:
+          type: string
+          format: email
+          example: "joao@example.com"
+        student_name:
+          type: string
+          example: "Pedrinho Silva"
+        grade_id:
+          type: integer
+          description: ID da série pretendida.
+          example: 2
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          example: "pending"
+
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 101
+        unit_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Carlos Pereira"
+        birth_date:
+          type: string
+          format: date
+          example: "2010-05-15"
+        status:
+          type: string
+          example: "active"
+
+security:
+  - bearerAuth: []
+
+paths:
+  /lead/store:
+    post:
+      summary: Enviar solicitação de Pré-Matrícula (Público)
+      description: Endpoint utilizado pela Landing Page pública para captar intenções de matrículas de novos alunos.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - parent_name
+                - phone
+                - student_name
+                - grade_id
+              properties:
+                parent_name:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                student_name:
+                  type: string
+                grade_id:
+                  type: integer
+      responses:
+        '201':
+          description: Lead criado com sucesso
+        '422':
+          description: Erro de Validação
+
+  /secretariat/leads:
+    get:
+      summary: Listar Leads Pendentes
+      description: Retorna a lista de intenções de matrículas que aguardam aprovação da secretaria. Requer role `secretaria` ou `admin`.
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PreEnrollment'
+
+  /secretariat/leads/{lead_id}/approve:
+    post:
+      summary: Aprovar Lead (Converter em Aluno)
+      description: Pega os dados do Lead e insere automaticamente na tabela de Estudantes oficiais, marcando o lead como `approved`.
+      parameters:
+        - in: path
+          name: lead_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lead convertido com sucesso
+
+  /academic/smart-tools/auto-enroll:
+    post:
+      summary: Enturmação em Lote (Assistente IA)
+      description: Distribui matematicamente um array de estudantes entre as turmas de uma determinada Série (Grade), respeitando o limite de capacidade de cada turma e garantindo homogeneidade.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - student_ids
+                - grade_id
+              properties:
+                student_ids:
+                  type: array
+                  items:
+                    type: integer
+                grade_id:
+                  type: integer
+      responses:
+        '200':
+          description: Estudantes enturmados e balanceados
+        '422':
+          description: Falha de validação ou turmas inexistentes
