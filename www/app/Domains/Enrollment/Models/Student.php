@@ -24,6 +24,18 @@ class Student extends Model implements AuditableContract
         'name',
         'document',
         'birth_date',
+        'gender',
+        'blood_type',
+        'medical_notes',
+        'phone',
+        'email',
+        'address_zipcode',
+        'address_street',
+        'address_number',
+        'address_neighborhood',
+        'address_city',
+        'address_state',
+        'status',
     ];
 
     protected function casts(): array

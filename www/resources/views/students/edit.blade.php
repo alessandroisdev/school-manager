@@ -1,53 +1,150 @@
 <x-app-layout>
-    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+    <div class="container-fluid">
         
-        <div class="mb-6 flex items-center">
-            <a href="{{ route('students.index') }}" class="text-gray-500 hover:text-blue-600 mr-3 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h3 mb-0 text-dark fw-bold">Editar Dados do Aluno</h2>
+            <a href="{{ route('students.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
             </a>
-            <h2 class="text-2xl font-bold text-gray-800">Editar Aluno</h2>
         </div>
 
-        <div class="bg-white shadow-sm sm:rounded-xl border border-gray-100 overflow-hidden">
-            <form action="{{ route('students.update', $student) }}" method="POST" class="p-8">
-                @csrf
-                @method('PUT')
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Nome -->
-                    <div class="md:col-span-2">
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
-                        <input type="text" name="name" id="name" value="{{ old('name', $student->name) }}" required 
-                               class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2">
-                        @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+        <form action="{{ route('students.update', $student) }}" method="POST">
+            @csrf
+            @method('PUT')
+            
+            <div class="row g-4">
+                <!-- Coluna Principal: Dados Pessoais e Endereço -->
+                <div class="col-lg-8">
+                    
+                    <!-- Dados Pessoais -->
+                    <div class="glass-card p-4 mb-4">
+                        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-person-badge me-2"></i> Dados Pessoais</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="name" class="form-label fw-bold text-muted small">Nome Completo do Aluno *</label>
+                                <input type="text" name="name" id="name" class="form-control form-control-lg bg-light border-0 @error('name') is-invalid @enderror" value="{{ old('name', $student->name) }}" required autofocus placeholder="Ex: João da Silva">
+                                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="document" class="form-label fw-bold text-muted small">Documento (CPF ou RG) *</label>
+                                <input type="text" name="document" id="document" class="form-control bg-light border-0 @error('document') is-invalid @enderror" value="{{ old('document', $student->document) }}" required placeholder="000.000.000-00">
+                                @error('document')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="birth_date" class="form-label fw-bold text-muted small">Data de Nascimento *</label>
+                                <input type="date" name="birth_date" id="birth_date" class="form-control bg-light border-0 @error('birth_date') is-invalid @enderror" value="{{ old('birth_date', $student->birth_date ? $student->birth_date->format('Y-m-d') : '') }}" required>
+                                @error('birth_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="gender" class="form-label fw-bold text-muted small">Gênero Identificado</label>
+                                <select name="gender" id="gender" class="form-select bg-light border-0 @error('gender') is-invalid @enderror">
+                                    <option value="">Selecione...</option>
+                                    <option value="Masculino" {{ old('gender', $student->gender) == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                                    <option value="Feminino" {{ old('gender', $student->gender) == 'Feminino' ? 'selected' : '' }}>Feminino</option>
+                                    <option value="Outro" {{ old('gender', $student->gender) == 'Outro' ? 'selected' : '' }}>Outro</option>
+                                </select>
+                                @error('gender')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="status" class="form-label fw-bold text-muted small">Status Institucional</label>
+                                <select name="status" id="status" class="form-select bg-light border-0 @error('status') is-invalid @enderror">
+                                    <option value="active" {{ old('status', $student->status) == 'active' ? 'selected' : '' }}>Matrícula Ativa</option>
+                                    <option value="inactive" {{ old('status', $student->status) == 'inactive' ? 'selected' : '' }}>Inativo</option>
+                                    <option value="transferred" {{ old('status', $student->status) == 'transferred' ? 'selected' : '' }}>Transferido</option>
+                                </select>
+                                @error('status')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Documento -->
-                    <div>
-                        <label for="document" class="block text-sm font-medium text-gray-700 mb-1">Documento (CPF/RG)</label>
-                        <input type="text" name="document" id="document" value="{{ old('document', $student->document) }}" required 
-                               class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2">
-                        @error('document') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                    <!-- Endereço -->
+                    <div class="glass-card p-4">
+                        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-geo-alt me-2"></i> Endereço Residencial</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="address_zipcode" class="form-label fw-bold text-muted small">CEP</label>
+                                <input type="text" name="address_zipcode" id="address_zipcode" class="form-control bg-light border-0 @error('address_zipcode') is-invalid @enderror" value="{{ old('address_zipcode', $student->address_zipcode) }}" placeholder="00000-000">
+                            </div>
+                            <div class="col-md-8">
+                                <label for="address_street" class="form-label fw-bold text-muted small">Logradouro (Rua, Av, etc)</label>
+                                <input type="text" name="address_street" id="address_street" class="form-control bg-light border-0 @error('address_street') is-invalid @enderror" value="{{ old('address_street', $student->address_street) }}" placeholder="Ex: Rua das Flores">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="address_number" class="form-label fw-bold text-muted small">Número / Apto</label>
+                                <input type="text" name="address_number" id="address_number" class="form-control bg-light border-0 @error('address_number') is-invalid @enderror" value="{{ old('address_number', $student->address_number) }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="address_neighborhood" class="form-label fw-bold text-muted small">Bairro</label>
+                                <input type="text" name="address_neighborhood" id="address_neighborhood" class="form-control bg-light border-0 @error('address_neighborhood') is-invalid @enderror" value="{{ old('address_neighborhood', $student->address_neighborhood) }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="address_city" class="form-label fw-bold text-muted small">Cidade</label>
+                                <input type="text" name="address_city" id="address_city" class="form-control bg-light border-0 @error('address_city') is-invalid @enderror" value="{{ old('address_city', $student->address_city) }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="address_state" class="form-label fw-bold text-muted small">UF</label>
+                                <input type="text" name="address_state" id="address_state" class="form-control bg-light border-0 @error('address_state') is-invalid @enderror" value="{{ old('address_state', $student->address_state) }}" placeholder="SP" maxlength="2">
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Data Nasc -->
-                    <div>
-                        <label for="birth_date" class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
-                        <input type="date" name="birth_date" id="birth_date" value="{{ old('birth_date', $student->birth_date?->format('Y-m-d')) }}" required 
-                               class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2">
-                        @error('birth_date') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                    </div>
                 </div>
 
-                <div class="mt-8 pt-5 border-t border-gray-100 flex justify-end">
-                    <a href="{{ route('students.index') }}" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 mr-3 transition-colors shadow-sm">
-                        Cancelar
-                    </a>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                        Atualizar Dados
-                    </button>
+                <!-- Coluna Lateral: Contato e Médico -->
+                <div class="col-lg-4">
+                    
+                    <!-- Contato -->
+                    <div class="glass-card p-4 mb-4">
+                        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-telephone me-2"></i> Contato Direto</h5>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label fw-bold text-muted small">Telefone Celular</label>
+                            <input type="text" name="phone" id="phone" class="form-control bg-light border-0 @error('phone') is-invalid @enderror" value="{{ old('phone', $student->phone) }}" placeholder="(00) 90000-0000">
+                            @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-bold text-muted small">E-mail do Aluno/Responsável</label>
+                            <input type="email" name="email" id="email" class="form-control bg-light border-0 @error('email') is-invalid @enderror" value="{{ old('email', $student->email) }}" placeholder="email@exemplo.com">
+                            @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+
+                    <!-- Ficha Médica -->
+                    <div class="glass-card p-4 mb-4 border-danger border-opacity-25">
+                        <h5 class="fw-bold mb-4 text-danger"><i class="bi bi-heart-pulse me-2"></i> Ficha Médica</h5>
+                        
+                        <div class="mb-3">
+                            <label for="blood_type" class="form-label fw-bold text-muted small">Tipo Sanguíneo</label>
+                            <select name="blood_type" id="blood_type" class="form-select bg-light border-0 @error('blood_type') is-invalid @enderror">
+                                <option value="">Não Informado</option>
+                                @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bt)
+                                    <option value="{{ $bt }}" {{ old('blood_type', $student->blood_type) == $bt ? 'selected' : '' }}>{{ $bt }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="medical_notes" class="form-label fw-bold text-muted small">Alergias e Condições Especiais</label>
+                            <textarea name="medical_notes" id="medical_notes" rows="4" class="form-control bg-light border-0 @error('medical_notes') is-invalid @enderror" placeholder="Descreva alergias a medicamentos, restrições alimentares, síndromes, etc.">{{ old('medical_notes', $student->medical_notes) }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                            <i class="bi bi-check-circle me-2"></i> Atualizar Aluno
+                        </button>
+                    </div>
+
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </x-app-layout>

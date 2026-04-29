@@ -13,7 +13,8 @@
                 $columns = [
                     ['name' => 'name_avatar', 'label' => 'Nome do Aluno'],
                     ['name' => 'document', 'label' => 'Documento'],
-                    ['name' => 'birth_date_formatted', 'label' => 'Data Nasc.', 'searchable' => false],
+                    ['name' => 'contact', 'label' => 'Contato', 'orderable' => false],
+                    ['name' => 'status_badge', 'label' => 'Status', 'searchable' => false],
                     ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
                 ];
             @endphp

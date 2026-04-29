@@ -31,6 +31,20 @@ class StudentController extends Controller
                 ->addColumn('birth_date_formatted', function($student) {
                     return $student->birth_date ? $student->birth_date->format('d/m/Y') : '-';
                 })
+                ->addColumn('contact', function($student) {
+                    $phone = $student->phone ? '<i class="bi bi-whatsapp text-success me-1"></i> ' . $student->phone : '<span class="text-muted small">Sem contato</span>';
+                    $email = $student->email ? '<br><small class="text-muted"><i class="bi bi-envelope"></i> ' . $student->email . '</small>' : '';
+                    return $phone . $email;
+                })
+                ->addColumn('status_badge', function($student) {
+                    if ($student->status === 'active') {
+                        return '<span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 border border-success border-opacity-25">Ativo</span>';
+                    } elseif ($student->status === 'inactive') {
+                        return '<span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 border border-secondary border-opacity-25">Inativo</span>';
+                    } else {
+                        return '<span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 border border-warning border-opacity-25">Transferido</span>';
+                    }
+                })
                 ->addColumn('actions', function($student) {
                     $editUrl = route('students.edit', $student);
                     $deleteUrl = route('students.destroy', $student);
@@ -47,7 +61,7 @@ class StudentController extends Controller
                         </div>
                     ';
                 })
-                ->rawColumns(['name_avatar', 'actions'])
+                ->rawColumns(['name_avatar', 'contact', 'status_badge', 'actions'])
                 ->make(true);
         }
 
@@ -70,14 +84,23 @@ class StudentController extends Controller
             'name' => 'required|string|max:255',
             'document' => 'required|string|max:50',
             'birth_date' => 'required|date',
+            'gender' => 'nullable|string|max:20',
+            'blood_type' => 'nullable|string|max:5',
+            'medical_notes' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'address_zipcode' => 'nullable|string|max:20',
+            'address_street' => 'nullable|string|max:255',
+            'address_number' => 'nullable|string|max:20',
+            'address_neighborhood' => 'nullable|string|max:255',
+            'address_city' => 'nullable|string|max:255',
+            'address_state' => 'nullable|string|max:2',
+            'status' => 'nullable|string|in:active,inactive,transferred',
         ]);
 
-        Student::create([
-            'unit_id' => $unitId,
-            'name' => $validated['name'],
-            'document' => $validated['document'],
-            'birth_date' => $validated['birth_date'],
-        ]);
+        $validated['unit_id'] = $unitId;
+
+        Student::create($validated);
 
         return redirect()->route('students.index')->with('success', 'Aluno cadastrado com sucesso!');
     }
@@ -93,6 +116,18 @@ class StudentController extends Controller
             'name' => 'required|string|max:255',
             'document' => 'required|string|max:50',
             'birth_date' => 'required|date',
+            'gender' => 'nullable|string|max:20',
+            'blood_type' => 'nullable|string|max:5',
+            'medical_notes' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'address_zipcode' => 'nullable|string|max:20',
+            'address_street' => 'nullable|string|max:255',
+            'address_number' => 'nullable|string|max:20',
+            'address_neighborhood' => 'nullable|string|max:255',
+            'address_city' => 'nullable|string|max:255',
+            'address_state' => 'nullable|string|max:2',
+            'status' => 'nullable|string|in:active,inactive,transferred',
         ]);
 
         $student->update($validated);
