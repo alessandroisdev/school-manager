@@ -156,3 +156,92 @@ paths:
           description: Estudantes enturmados e balanceados
         '422':
           description: Falha de validação ou turmas inexistentes
+
+  /admin/official-documents:
+    get:
+      summary: Listar Documentos Oficiais (Ofícios, Portarias)
+      description: Retorna a listagem paginada de todos os expedientes oficiais da Unidade ativa.
+      responses:
+        '200':
+          description: Listagem de Documentos
+    post:
+      summary: Emitir Documento Oficial (Rascunho)
+      description: Inicia um novo Ofício com numeração automática sequencial segura (lockForUpdate).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_id:
+                  type: integer
+                date:
+                  type: string
+                  format: date
+                recipient:
+                  type: string
+                subject:
+                  type: string
+                content:
+                  type: string
+                signer_id:
+                  type: integer
+      responses:
+        '201':
+          description: Ofício Rascunho criado com sucesso
+
+  /admin/official-documents/{id}/pdf:
+    get:
+      summary: Gerar PDF ABNT do Documento
+      description: Baixa o PDF formatado do ofício com brasão, rodapé oficial e métricas da ABNT.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF Gerado com sucesso
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /secretariat/protocols:
+    get:
+      summary: Listar Protocolos Recebidos
+      description: Listagem de documentos que entraram na Unidade (Inbound), com avisos de SLA.
+      responses:
+        '200':
+          description: Sucesso
+    post:
+      summary: Registrar Recebimento de Protocolo
+      description: Cria um novo registro e aceita arrays de arquivos como anexos (multipart/form-data).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                sender:
+                  type: string
+                subject:
+                  type: string
+                received_date:
+                  type: string
+                  format: date
+                due_date:
+                  type: string
+                  format: date
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Protocolo criado

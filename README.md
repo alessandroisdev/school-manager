@@ -18,6 +18,9 @@ O **SGE (Sistema de Gestão Escolar)** é uma aplicação SaaS desenvolvida em *
   - _Assistente de Enturmação:_ Algoritmo matemático _Round-Robin_ que pega uma fila de alunos recém-matriculados e os divide homogeneamente entre as turmas existentes, respeitando o limite físico (capacity) das salas.
 - 📝 **Diário de Classe do Professor:** Interface focada em produtividade. O professor faz a Chamada (Frequência) de todos os alunos em lote, e lança notas vinculadas a avaliações cadastradas.
 - 💰 **Módulo Financeiro:** Faturamento, gerenciamento de Mensalidades, baixa de boletos e multas baseadas nas configurações globais da Unidade.
+- 🏛️ **Comunicação Oficial (Governança):** Motor avançado de redação de documentos (Ofícios, Portarias) configurado em layout A4 com geração de PDFs seguindo o _Manual de Redação da Presidência da República_ (Padrão ABNT). Possui `lockForUpdate` em transações para numerações seguras.
+- 📨 **Protocolo de Recebimento (Inbound):** Central de recebimento com suporte a múltiplos anexos, SLA dinâmico (aviso de prazos estourando) e Widgets de alerta em tempo real no Dashboard.
+- 🖨️ **Geração de Documentos (Individual/Lote):** Possibilidade de gerar atestados, recibos e declarações isoladamente ou gerar em Lote para uma turma inteira, criando históricos de emissão imutáveis na ficha do aluno.
 - ⚙️ **Configurações Globais:** Personalize o comportamento de cada escola independentemente (Ex: "Frequência Mínima", "Máximo de Alunos por Turma").
 
 ## 🛠️ Stack Tecnológica
