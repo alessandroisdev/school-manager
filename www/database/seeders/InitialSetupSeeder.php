@@ -52,5 +52,14 @@ class InitialSetupSeeder extends Seeder
         );
 
         $admin->units()->syncWithoutDetaching([$unit->id]);
+
+        \App\Domains\Academic\Models\AcademicYear::firstOrCreate(
+            ['unit_id' => $unit->id, 'year' => date('Y')],
+            [
+                'start_date' => date('Y-02-01'),
+                'end_date' => date('Y-12-15'),
+                'is_active' => true,
+            ]
+        );
     }
 }

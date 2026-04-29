@@ -2,8 +2,14 @@ import './bootstrap';
 import * as bootstrap from 'bootstrap';
 import Swal from 'sweetalert2';
 
+import $ from 'jquery';
+import DataTable from 'datatables.net-dt';
+import 'datatables.net-dt/css/dataTables.dataTables.min.css';
+
 window.bootstrap = bootstrap;
 window.Swal = Swal;
+window.$ = window.jQuery = $;
+window.DataTable = DataTable;
 
 const Toast = Swal.mixin({
     toast: true,

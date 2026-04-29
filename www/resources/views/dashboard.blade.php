@@ -1,61 +1,66 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="container-fluid">
         
         @if (session('status'))
-            <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('status') }}</span>
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> {{ session('status') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
         
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-xl">
-            <div class="p-8 text-gray-900 flex items-center justify-between">
-                <div>
-                    <h3 class="text-2xl font-bold tracking-tight">Bem-vindo(a) de volta, {{ Auth::user()->name }}!</h3>
-                    <p class="mt-1 text-gray-500">
-                        O painel de controle do SGE está pronto para uso.
-                    </p>
+        <div class="glass-card mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div class="mb-3 mb-md-0">
+                    <h3 class="fw-bold text-dark mb-1">Bem-vindo(a) de volta, {{ Auth::user()->name }}!</h3>
+                    <p class="text-muted mb-0">O painel de controle do SGE está pronto para uso.</p>
                 </div>
                 
-                <div class="text-right">
-                    <p class="text-sm text-gray-500">Unidade Operacional Ativa</p>
-                    <p class="text-lg font-black text-blue-600">
+                <div class="text-md-end">
+                    <p class="small text-muted mb-1 text-uppercase fw-bold" style="letter-spacing: 0.5px;">Unidade Operacional Ativa</p>
+                    <p class="h5 fw-black text-primary mb-0">
                         {{ Auth::user()->units->where('id', session('active_unit_id'))->first()?->name ?? 'Nenhuma unidade configurada' }}
                     </p>
                 </div>
             </div>
         </div>
         
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="row g-4">
             <!-- Card 1 -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm font-medium">Alunos Ativos</p>
-                    <p class="text-2xl font-bold text-gray-800">1,204</p>
+            <div class="col-md-4">
+                <div class="glass-card d-flex align-items-center h-100 p-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-people fs-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small fw-bold mb-0 text-uppercase">Alunos Ativos</p>
+                        <h3 class="fw-black text-dark mb-0">1.204</h3>
+                    </div>
                 </div>
             </div>
             
             <!-- Card 2 -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm font-medium">Frequência Hoje</p>
-                    <p class="text-2xl font-bold text-gray-800">96.5%</p>
+            <div class="col-md-4">
+                <div class="glass-card d-flex align-items-center h-100 p-4">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-graph-up-arrow fs-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small fw-bold mb-0 text-uppercase">Frequência Hoje</p>
+                        <h3 class="fw-black text-dark mb-0">96.5%</h3>
+                    </div>
                 </div>
             </div>
             
             <!-- Card 3 -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm font-medium">Bimestre Ativo</p>
-                    <p class="text-2xl font-bold text-gray-800">2º Bim</p>
+            <div class="col-md-4">
+                <div class="glass-card d-flex align-items-center h-100 p-4">
+                    <div class="bg-purple bg-opacity-10 text-purple rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; color: #6f42c1; background-color: rgba(111, 66, 193, 0.1);">
+                        <i class="bi bi-calendar-event fs-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small fw-bold mb-0 text-uppercase">Bimestre Ativo</p>
+                        <h3 class="fw-black text-dark mb-0">2º Bim</h3>
+                    </div>
                 </div>
             </div>
         </div>
