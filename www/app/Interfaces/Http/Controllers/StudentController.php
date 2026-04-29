@@ -263,6 +263,8 @@ class StudentController extends Controller
             foreach ($assignments as $assignment) {
                 $subject = $assignment->subject;
                 
+                if (!$subject) continue;
+                
                 // Soma de notas deste aluno nesta matéria, nesta turma
                 $totalScore = \App\Domains\Evaluation\Models\GradeEntry::where('student_id', $student->id)
                     ->whereHas('evaluation', function($q) use ($classId, $subject) {
