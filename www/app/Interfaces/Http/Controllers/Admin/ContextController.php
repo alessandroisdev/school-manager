@@ -19,6 +19,13 @@ class ContextController extends Controller
             'unit_id' => 'required|exists:units,id',
         ]);
 
+        $user = auth()->user();
+        
+        // Verifica se o usuário tem acesso à unidade (Admin master tem acesso a tudo)
+        if (!$user->hasRole('admin') && !$user->units->contains($validated['unit_id'])) {
+            return redirect()->back()->withErrors('Você não tem permissão para acessar esta unidade.');
+        }
+
         $unit = Unit::findOrFail($validated['unit_id']);
         
         // Grava na sessão o ID da unidade atual
