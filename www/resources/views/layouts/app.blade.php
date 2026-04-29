@@ -58,6 +58,11 @@
                         <i class="bi bi-building me-2"></i> Gestão de Franquias
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                        <i class="bi bi-gear-fill me-2"></i> Configurações Globais
+                    </a>
+                </li>
                 @endif
                 
                 @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor') || auth()->user()->hasRole('secretaria'))
@@ -84,6 +89,11 @@
 
                 @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor'))
                 <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Módulo Pedagógico</h6>
+                <li>
+                    <a href="{{ route('academic.smart.index') }}" class="nav-link {{ request()->routeIs('academic.smart.*') ? 'active' : '' }}">
+                        <i class="bi bi-magic me-2 text-warning"></i> Enturmação em Lote (IA)
+                    </a>
+                </li>
                 <li>
                     <a href="{{ route('academic.grades.index') }}" class="nav-link {{ request()->routeIs('academic.grades.*') ? 'active' : '' }}">
                         <i class="bi bi-mortarboard me-2"></i> Séries e Anos

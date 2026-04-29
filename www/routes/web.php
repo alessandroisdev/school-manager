@@ -35,6 +35,10 @@ Route::middleware('auth')->group(function () {
     // Administração Global (Super Admin)
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('units', \App\Interfaces\Http\Controllers\Admin\UnitController::class)->except(['show']);
+        
+        // Configurações da Unidade
+        Route::get('settings', [\App\Interfaces\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('settings', [\App\Interfaces\Http\Controllers\Admin\SettingController::class, 'store'])->name('settings.store');
     });
 
     // Módulo Secretaria
@@ -50,6 +54,11 @@ Route::middleware('auth')->group(function () {
 
     // Módulo Acadêmico / Pedagógico
     Route::prefix('academic')->name('academic.')->group(function () {
+        
+        // Smart Tools (IA)
+        Route::get('smart-tools', [\App\Interfaces\Http\Controllers\Academic\SmartAssignmentController::class, 'index'])->name('smart.index');
+        Route::post('smart-tools/auto-enroll', [\App\Interfaces\Http\Controllers\Academic\SmartAssignmentController::class, 'autoEnroll'])->name('smart.autoEnroll');
+
         Route::resource('grades', \App\Interfaces\Http\Controllers\Academic\GradeController::class)->except(['show']);
         Route::resource('shifts', \App\Interfaces\Http\Controllers\Academic\ShiftController::class)->except(['show']);
         Route::resource('classes', \App\Interfaces\Http\Controllers\Academic\SchoolClassController::class)->except(['show']);
