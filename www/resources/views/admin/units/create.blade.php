@@ -45,6 +45,21 @@
                     </div>
 
                     <div class="col-md-12">
+                        <label for="address" class="form-label fw-bold text-muted small">Endereço Completo</label>
+                        <input type="text" name="address" id="address" class="form-control bg-light border-0" placeholder="Ex: Rua das Flores, 123">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="city" class="form-label fw-bold text-muted small">Cidade</label>
+                        <input type="text" name="city" id="city" class="form-control bg-light border-0">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="state" class="form-label fw-bold text-muted small">Estado (UF)</label>
+                        <input type="text" name="state" id="state" class="form-control bg-light border-0" placeholder="Ex: SP" maxlength="2">
+                    </div>
+
+                    <div class="col-md-12">
                         <div class="form-check form-switch mt-2">
                             <input class="form-check-input" type="checkbox" role="switch" id="is_active" name="is_active" checked>
                             <label class="form-check-label fw-bold" for="is_active">Unidade Operacional (Ativa)</label>

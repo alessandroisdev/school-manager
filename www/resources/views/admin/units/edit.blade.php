@@ -42,7 +42,22 @@
 
                     <div class="col-md-6">
                         <label for="phone" class="form-label fw-bold text-muted small">Telefone Principal</label>
-                        <input type="text" name="phone" id="phone" class="form-control bg-light border-0" value="{{ $unit->phone }}">
+                        <input type="text" name="phone" id="phone" class="form-control bg-light border-0" value="{{ old('phone', $unit->phone) }}">
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="address" class="form-label fw-bold text-muted small">Endereço Completo</label>
+                        <input type="text" name="address" id="address" class="form-control bg-light border-0" value="{{ old('address', $unit->address) }}" placeholder="Ex: Rua das Flores, 123">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="city" class="form-label fw-bold text-muted small">Cidade</label>
+                        <input type="text" name="city" id="city" class="form-control bg-light border-0" value="{{ old('city', $unit->city) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="state" class="form-label fw-bold text-muted small">Estado (UF)</label>
+                        <input type="text" name="state" id="state" class="form-control bg-light border-0" value="{{ old('state', $unit->state) }}" placeholder="Ex: SP" maxlength="2">
                     </div>
 
                     <div class="col-md-12">

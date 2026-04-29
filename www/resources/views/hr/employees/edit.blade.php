@@ -50,6 +50,22 @@
                     </div>
                 </div>
 
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label fw-bold text-muted small">Telefone</label>
+                        <input type="text" name="phone" id="phone" class="form-control bg-light border-0 @error('phone') is-invalid @enderror" value="{{ old('phone', $employee->phone) }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="base_salary" class="form-label fw-bold text-muted small">Salário Base (R$)</label>
+                        <input type="number" step="0.01" name="base_salary" id="base_salary" class="form-control bg-light border-0 @error('base_salary') is-invalid @enderror" value="{{ old('base_salary', $employee->base_salary) }}">
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="address" class="form-label fw-bold text-muted small">Endereço Completo</label>
+                        <input type="text" name="address" id="address" class="form-control bg-light border-0 @error('address') is-invalid @enderror" value="{{ old('address', $employee->address) }}">
+                    </div>
+                </div>
+
                 <hr class="my-4 border-secondary">
 
                 <div class="text-end">

@@ -72,10 +72,13 @@ class EmployeeController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'document' => 'required|string|max:50|unique:employees,document',
+            'document' => 'required|string|max:20|unique:employees,document',
             'position' => 'nullable|string|max:255',
             'hire_date' => 'nullable|date',
             'is_active' => 'boolean',
+            'phone' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'base_salary' => 'nullable|numeric|min:0'
         ]);
 
         $validated['unit_id'] = $unitId;
@@ -98,6 +101,9 @@ class EmployeeController extends Controller
             'position' => 'nullable|string|max:255',
             'hire_date' => 'nullable|date',
             'is_active' => 'boolean',
+            'phone' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'base_salary' => 'nullable|numeric|min:0'
         ]);
 
         $employee->update($validated);
