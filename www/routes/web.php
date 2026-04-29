@@ -5,9 +5,8 @@ use App\Interfaces\Http\Controllers\DashboardController;
 use App\Interfaces\Http\Controllers\UnitSessionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect('/login');
-});
+Route::get('/', [\App\Interfaces\Http\Controllers\PublicController::class, 'index'])->name('welcome');
+Route::post('/lead/store', [\App\Interfaces\Http\Controllers\PublicController::class, 'storeLead'])->name('public.lead.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -40,6 +39,11 @@ Route::middleware('auth')->group(function () {
 
     // Módulo Secretaria
     Route::prefix('secretariat')->group(function () {
+        // CRM Captação
+        Route::get('leads', [\App\Interfaces\Http\Controllers\Secretariat\LeadController::class, 'index'])->name('secretariat.leads.index');
+        Route::post('leads/{lead}/approve', [\App\Interfaces\Http\Controllers\Secretariat\LeadController::class, 'approve'])->name('secretariat.leads.approve');
+        Route::post('leads/{lead}/reject', [\App\Interfaces\Http\Controllers\Secretariat\LeadController::class, 'reject'])->name('secretariat.leads.reject');
+
         Route::resource('students', \App\Interfaces\Http\Controllers\StudentController::class);
         Route::resource('enrollments', \App\Interfaces\Http\Controllers\EnrollmentController::class)->except(['show', 'edit', 'update']);
     });

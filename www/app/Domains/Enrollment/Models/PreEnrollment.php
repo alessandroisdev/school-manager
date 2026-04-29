@@ -2,14 +2,12 @@
 
 namespace App\Domains\Enrollment\Models;
 
-use App\Domains\Academic\Models\AcademicYear;
 use App\Domains\Academic\Models\Grade;
-use App\Domains\Enrollment\Enums\PreEnrollmentStatus;
 use App\Domains\Shared\Models\Unit;
-use App\Infrastructure\Persistence\Traits\HasUnitScope;
+use App\Traits\HasUnitScope;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PreEnrollment extends Model
 {
@@ -17,32 +15,18 @@ class PreEnrollment extends Model
 
     protected $fillable = [
         'unit_id',
-        'academic_year_id',
-        'grade_id',
+        'parent_name',
+        'email',
+        'phone',
         'student_name',
-        'student_birth_date',
-        'guardian_name',
-        'guardian_email',
-        'guardian_phone',
+        'grade_id',
+        'notes',
         'status',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'student_birth_date' => 'date',
-            'status' => PreEnrollmentStatus::class,
-        ];
-    }
 
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
-    }
-
-    public function academicYear(): BelongsTo
-    {
-        return $this->belongsTo(AcademicYear::class);
     }
 
     public function grade(): BelongsTo
