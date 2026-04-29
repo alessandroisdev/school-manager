@@ -25,6 +25,13 @@ class Employee extends Model implements AuditableContract
         'position',
         'hire_date',
         'is_active',
+        'phone',
+        'email',
+        'address',
+        'city',
+        'state',
+        'birth_date',
+        'salary'
     ];
 
     protected function casts(): array

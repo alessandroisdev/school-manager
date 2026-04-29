@@ -25,6 +25,8 @@ class Invoice extends Model implements AuditableContract
         'due_date',
         'status',
         'paid_at',
+        'description',
+        'payment_method'
     ];
 
     protected function casts(): array

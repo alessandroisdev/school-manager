@@ -1,65 +1,76 @@
 <x-app-layout>
     <div class="container-fluid">
-        
-        @if (session('status'))
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ session('status') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="h3 mb-1 text-dark fw-bold">Cockpit Executivo</h2>
+                <p class="text-muted small mb-0">Visão gerencial da unidade de ensino.</p>
             </div>
-        @endif
-        
-        <div class="glass-card mb-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div class="mb-3 mb-md-0">
-                    <h3 class="fw-bold text-dark mb-1">Bem-vindo(a) de volta, {{ Auth::user()->name }}!</h3>
-                    <p class="text-muted mb-0">O painel de controle do SGE está pronto para uso.</p>
+            <div>
+                <button class="btn btn-primary bg-gradient shadow-sm rounded-pill px-4">
+                    <i class="bi bi-cloud-download me-2"></i> Relatório PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Card Alunos -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-center position-relative overflow-hidden" style="border-left: 4px solid #3b82f6;">
+                    <i class="bi bi-people-fill position-absolute text-primary opacity-10" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Alunos Ativos</p>
+                    <h3 class="fw-bold mb-0 text-dark">{{ $totalStudents }}</h3>
                 </div>
-                
-                <div class="text-md-end">
-                    <p class="small text-muted mb-1 text-uppercase fw-bold" style="letter-spacing: 0.5px;">Unidade Operacional Ativa</p>
-                    <p class="h5 fw-black text-primary mb-0">
-                        {{ Auth::user()->units->where('id', session('active_unit_id'))->first()?->name ?? 'Nenhuma unidade configurada' }}
-                    </p>
+            </div>
+
+            <!-- Card Professores -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-center position-relative overflow-hidden" style="border-left: 4px solid #8b5cf6;">
+                    <i class="bi bi-person-workspace position-absolute text-purple opacity-10" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Corpo Docente</p>
+                    <h3 class="fw-bold mb-0 text-dark">{{ $totalTeachers }}</h3>
+                </div>
+            </div>
+
+            <!-- Card Receita -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-center position-relative overflow-hidden" style="border-left: 4px solid #10b981;">
+                    <i class="bi bi-piggy-bank-fill position-absolute text-success opacity-10" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Receita Realizada (Paga)</p>
+                    <h3 class="fw-bold mb-0 text-success">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</h3>
+                </div>
+            </div>
+
+            <!-- Card Inadimplencia -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-center position-relative overflow-hidden" style="border-left: 4px solid #ef4444;">
+                    <i class="bi bi-exclamation-triangle-fill position-absolute text-danger opacity-10" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Inadimplência (Atrasados)</p>
+                    <h3 class="fw-bold mb-0 text-danger">R$ {{ number_format($overdueRevenue, 2, ',', '.') }}</h3>
                 </div>
             </div>
         </div>
-        
+
         <div class="row g-4">
-            <!-- Card 1 -->
-            <div class="col-md-4">
-                <div class="glass-card d-flex align-items-center h-100 p-4">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-people fs-4"></i>
-                    </div>
-                    <div>
-                        <p class="text-muted small fw-bold mb-0 text-uppercase">Alunos Ativos</p>
-                        <h3 class="fw-black text-dark mb-0">1.204</h3>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Card 2 -->
-            <div class="col-md-4">
-                <div class="glass-card d-flex align-items-center h-100 p-4">
-                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-graph-up-arrow fs-4"></i>
-                    </div>
-                    <div>
-                        <p class="text-muted small fw-bold mb-0 text-uppercase">Frequência Hoje</p>
-                        <h3 class="fw-black text-dark mb-0">96.5%</h3>
+            <div class="col-lg-8">
+                <div class="glass-card p-4 h-100">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-graph-up text-primary me-2"></i> Desempenho Financeiro</h5>
+                    <div class="d-flex align-items-center justify-content-center bg-light rounded" style="height: 300px; border: 1px dashed #cbd5e1;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-bar-chart-fill fs-1 text-secondary opacity-50 mb-2"></i>
+                            <p class="mb-0">Aguardando período letivo para gerar o gráfico</p>
+                            <p class="small text-primary fw-bold mt-2">Valores Abertos: R$ {{ number_format($pendingRevenue, 2, ',', '.') }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Card 3 -->
-            <div class="col-md-4">
-                <div class="glass-card d-flex align-items-center h-100 p-4">
-                    <div class="bg-purple bg-opacity-10 text-purple rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; color: #6f42c1; background-color: rgba(111, 66, 193, 0.1);">
-                        <i class="bi bi-calendar-event fs-4"></i>
-                    </div>
-                    <div>
-                        <p class="text-muted small fw-bold mb-0 text-uppercase">Bimestre Ativo</p>
-                        <h3 class="fw-black text-dark mb-0">2º Bim</h3>
+            <div class="col-lg-4">
+                <div class="glass-card p-4 h-100" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+                    <h5 class="fw-bold mb-4 text-white"><i class="bi bi-lightning-fill text-warning me-2"></i> Ações Rápidas</h5>
+                    <div class="d-grid gap-3">
+                        <a href="{{ route('enrollments.index') }}" class="btn btn-outline-light text-start py-3"><i class="bi bi-person-plus-fill me-2"></i> Nova Matrícula</a>
+                        <a href="{{ route('finance.invoices.index') }}" class="btn btn-outline-light text-start py-3"><i class="bi bi-cash-stack me-2"></i> Gerar Faturas</a>
+                        <a href="{{ route('academic.smart.index') }}" class="btn btn-warning text-start py-3 text-dark fw-bold"><i class="bi bi-magic me-2"></i> Enturmação Inteligente</a>
                     </div>
                 </div>
             </div>

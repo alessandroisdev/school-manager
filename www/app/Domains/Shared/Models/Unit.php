@@ -20,6 +20,9 @@ class Unit extends Model
         'email',
         'phone',
         'is_active',
+        'address',
+        'city',
+        'state'
     ];
 
     protected function casts(): array
