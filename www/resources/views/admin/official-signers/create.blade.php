@@ -11,15 +11,24 @@
         </div>
 
         <div class="glass-card p-4" style="max-width: 600px;">
+            @if ($errors->any())
+                <div class="alert alert-danger pb-0">
+                    <ul class="mb-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <form action="{{ route('admin.official-signers.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label fw-bold text-muted small">Nome Completo *</label>
-                    <input type="text" name="name" class="form-control bg-light border-0" required placeholder="Ex: Dr. Fulano de Tal">
+                    <input type="text" name="name" class="form-control bg-light border-0" required placeholder="Ex: Dr. Fulano de Tal" value="{{ old('name') }}">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold text-muted small">Cargo / Título *</label>
-                    <input type="text" name="title" class="form-control bg-light border-0" required placeholder="Ex: Diretor Geral">
+                    <input type="text" name="title" class="form-control bg-light border-0" required placeholder="Ex: Diretor Geral" value="{{ old('title') }}">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold text-muted small">Imagem da Assinatura (Fundo Transparente)</label>
@@ -27,7 +36,7 @@
                     <small class="text-muted">Deixe em branco para assinatura física (à caneta).</small>
                 </div>
                 <div class="mb-4 form-check form-switch">
-                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive" checked>
+                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive" value="1" checked>
                     <label class="form-check-label fw-bold text-muted small" for="isActive">Assinante Ativo</label>
                 </div>
 

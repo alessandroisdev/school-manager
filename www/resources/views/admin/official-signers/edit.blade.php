@@ -11,16 +11,25 @@
         </div>
 
         <div class="glass-card p-4" style="max-width: 600px;">
+            @if ($errors->any())
+                <div class="alert alert-danger pb-0">
+                    <ul class="mb-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <form action="{{ route('admin.official-signers.update', $officialSigner) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
                     <label class="form-label fw-bold text-muted small">Nome Completo *</label>
-                    <input type="text" name="name" class="form-control bg-light border-0" required value="{{ $officialSigner->name }}">
+                    <input type="text" name="name" class="form-control bg-light border-0" required value="{{ old('name', $officialSigner->name) }}">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold text-muted small">Cargo / Título *</label>
-                    <input type="text" name="title" class="form-control bg-light border-0" required value="{{ $officialSigner->title }}">
+                    <input type="text" name="title" class="form-control bg-light border-0" required value="{{ old('title', $officialSigner->title) }}">
                 </div>
                 
                 <div class="mb-3">
@@ -41,7 +50,7 @@
                 </div>
 
                 <div class="mb-4 form-check form-switch">
-                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive" {{ $officialSigner->is_active ? 'checked' : '' }}>
+                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive" value="1" {{ old('is_active', $officialSigner->is_active) ? 'checked' : '' }}>
                     <label class="form-check-label fw-bold text-muted small" for="isActive">Assinante Ativo</label>
                 </div>
 
