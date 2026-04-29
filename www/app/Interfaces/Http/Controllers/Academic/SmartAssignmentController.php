@@ -75,8 +75,7 @@ class SmartAssignmentController extends Controller
                     Enrollment::create([
                         'student_id' => $studentId,
                         'school_class_id' => $targetClass->id,
-                        'enrollment_date' => now(),
-                        'status' => 'active',
+                        'status' => \App\Domains\Enrollment\Enums\EnrollmentStatus::Ativa,
                     ]);
 
                     $targetClass->enrollments_count++;

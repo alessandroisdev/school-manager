@@ -84,7 +84,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-warning w-100 py-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; color: white;">
+                    <button type="submit" id="btnSubmitAI" class="btn btn-warning w-100 py-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; color: white;">
                         <i class="bi bi-lightning-fill me-1"></i> Executar Enturmação em Lote
                     </button>
                     </form>
@@ -97,6 +97,14 @@
         document.getElementById('selectAll').addEventListener('change', function(e) {
             let checkboxes = document.querySelectorAll('.student-checkbox');
             checkboxes.forEach(cb => cb.checked = e.target.checked);
+        });
+
+        document.getElementById('smartEnrollForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('btnSubmitAI');
+            if(btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> A IA está analisando e balanceando...';
+            }
         });
     </script>
 </x-app-layout>

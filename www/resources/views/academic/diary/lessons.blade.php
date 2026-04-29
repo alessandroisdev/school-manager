@@ -24,12 +24,97 @@
                                 <input type="date" name="date" id="date" class="form-control bg-light border-0" value="{{ date('Y-m-d') }}" required>
                             </div>
                             <div class="col-md-8">
-                                <label for="notes" class="form-label fw-bold text-muted small">Conteúdo Lecionado</label>
-                                <input type="text" name="notes" id="notes" class="form-control bg-light border-0" placeholder="Ex: Equações de 2º Grau" required>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="notes" class="form-label fw-bold text-muted small m-0">Conteúdo Lecionado / Plano de Aula</label>
+                                    <button type="button" class="btn btn-sm btn-light text-primary fw-bold px-3 py-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#aiLessonModal" style="border: 1px solid #cce5ff;">
+                                        <i class="bi bi-stars text-warning"></i> Gerar com IA
+                                    </button>
+                                </div>
+                                <textarea name="notes" id="notes" class="form-control bg-light border-0" rows="2" placeholder="Ex: Equações de 2º Grau" required></textarea>
                             </div>
                         </div>
 
-                        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-list-check me-2"></i> Lista de Chamada</h6>
+                        <!-- Modal AI Lesson Planner -->
+                        <div class="modal fade" id="aiLessonModal" tabindex="-1" aria-labelledby="aiLessonModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <div class="modal-header bg-primary bg-opacity-10 border-0">
+                                        <h5 class="modal-title text-primary fw-bold" id="aiLessonModalLabel"><i class="bi bi-stars text-warning me-2"></i> Assistente de Plano de Aula (IA)</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-dark">Qual será o tema da aula?</label>
+                                            <input type="text" id="aiThemeInput" class="form-control form-control-lg bg-light border-0" placeholder="Ex: Revolução Francesa e seus impactos">
+                                        </div>
+                                        <div id="aiLoading" class="text-center py-4 d-none">
+                                            <div class="spinner-grow text-primary mb-3" role="status"></div>
+                                            <p class="text-muted fw-bold mb-0">Analisando currículo e gerando plano...</p>
+                                        </div>
+                                        <div id="aiResultContainer" class="d-none">
+                                            <label class="form-label fw-bold text-success small text-uppercase">Plano Sugerido:</label>
+                                            <div id="aiResultText" class="p-3 bg-light rounded text-dark small" style="white-space: pre-wrap;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-primary fw-bold" id="btnGenerateAI">
+                                            <i class="bi bi-magic me-1"></i> Gerar Plano
+                                        </button>
+                                        <button type="button" class="btn btn-success fw-bold d-none" id="btnUsePlanAI" data-bs-dismiss="modal">
+                                            <i class="bi bi-check-lg me-1"></i> Usar este Plano
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const btnGenerate = document.getElementById('btnGenerateAI');
+                                const btnUse = document.getElementById('btnUsePlanAI');
+                                const inputTheme = document.getElementById('aiThemeInput');
+                                const loading = document.getElementById('aiLoading');
+                                const resultContainer = document.getElementById('aiResultContainer');
+                                const resultText = document.getElementById('aiResultText');
+                                const notesInput = document.getElementById('notes');
+
+                                let generatedPlan = '';
+
+                                btnGenerate.addEventListener('click', function() {
+                                    const theme = inputTheme.value.trim();
+                                    if(!theme) {
+                                        window.Toast.fire({icon: 'warning', title: 'Digite o tema da aula!'});
+                                        return;
+                                    }
+
+                                    // Reset UI
+                                    resultContainer.classList.add('d-none');
+                                    btnUse.classList.add('d-none');
+                                    btnGenerate.classList.add('d-none');
+                                    loading.classList.remove('d-none');
+
+                                    // Simula a chamada da API da IA (delay de 2s)
+                                    setTimeout(() => {
+                                        generatedPlan = `Tema: ${theme}\n\n🎯 Objetivo:\nCompreender os principais aspectos e impactos relacionados ao tema central, desenvolvendo senso crítico.\n\n📚 Metodologia:\nAula expositiva dialogada inicial, seguida de divisão em pequenos grupos para estudo de caso (Sala Invertida) e debate.\n\n✅ Avaliação:\nParticipação no debate e entrega de um mapa mental ao final da aula.`;
+                                        
+                                        resultText.textContent = generatedPlan;
+                                        
+                                        loading.classList.add('d-none');
+                                        resultContainer.classList.remove('d-none');
+                                        btnUse.classList.remove('d-none');
+                                        btnGenerate.classList.remove('d-none');
+                                        btnGenerate.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Gerar Novamente';
+                                    }, 2000);
+                                });
+
+                                btnUse.addEventListener('click', function() {
+                                    notesInput.value = generatedPlan;
+                                });
+                            });
+                        </script>
+
+                        <h6 class="fw-bold text-primary mb-3 mt-4"><i class="bi bi-list-check me-2"></i> Lista de Chamada</h6>
                         
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">

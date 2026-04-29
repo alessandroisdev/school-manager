@@ -53,6 +53,18 @@ class TeacherPortalController extends Controller
                 ->make(true);
         }
 
-        return view('academic.diary.index');
+        // Gerando Insights Simulados por IA (Análise Preditiva de Risco)
+        $insights = [
+            'at_risk' => [
+                ['name' => 'João Silva', 'class' => '9º Ano Fundamental - Turma A', 'reason' => 'Frequência caiu para 65% nas últimas duas semanas.'],
+                ['name' => 'Maria Oliveira', 'class' => '1ª Série Ensino Médio - Turma A', 'reason' => 'Notas sistematicamente abaixo da média em Matemática.']
+            ],
+            'highlights' => [
+                ['name' => 'Ana Costa', 'class' => '9º Ano Fundamental - Turma B', 'reason' => 'Evolução de 30% no rendimento nas últimas avaliações.']
+            ],
+            'suggestion' => 'Recomendamos enviar uma notificação aos responsáveis de João Silva solicitando uma reunião de alinhamento.'
+        ];
+
+        return view('academic.diary.index', compact('insights'));
     }
 }
