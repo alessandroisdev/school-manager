@@ -54,11 +54,10 @@ class StudentController extends Controller
 
                     return '
                         <div class="text-end text-nowrap">
-                            <a href="' . $showUrl . '" class="btn btn-sm btn-light text-success fw-bold me-2"><i class="bi bi-file-earmark-bar-graph"></i> Boletim</a>
-                            <a href="' . $editUrl . '" class="btn btn-sm btn-light text-primary fw-bold me-2"><i class="bi bi-pencil-square"></i> Editar</a>
+                            <a href="' . $showUrl . '" class="btn btn-sm btn-primary fw-bold me-2 shadow-sm"><i class="bi bi-person-lines-fill"></i> Central do Aluno</a>
                             <form action="' . $deleteUrl . '" method="POST" class="d-inline-block form-delete">
                                 ' . $csrf . $method . '
-                                <button type="submit" class="btn btn-sm btn-light text-danger fw-bold"><i class="bi bi-trash"></i> Excluir</button>
+                                <button type="submit" class="btn btn-sm btn-light text-danger fw-bold shadow-sm"><i class="bi bi-trash"></i> Excluir</button>
                             </form>
                         </div>
                     ';
@@ -321,6 +320,15 @@ class StudentController extends Controller
             
         $unitSettings = \App\Domains\Shared\Models\UnitSetting::where('unit_id', session('active_unit_id'))->first();
 
-        return view('students.show', compact('student', 'reportCards', 'templates', 'issuedDocuments', 'invoices', 'unitSettings'));
+        // Dados para a aba de Edição
+        $activeEnrollment = \App\Domains\Enrollment\Models\Enrollment::with('schoolClass')
+            ->where('student_id', $student->id)
+            ->whereIn('status', ['active', 'ativa'])
+            ->latest()
+            ->first();
+            
+        $bankAccounts = \App\Domains\Finance\Models\BankAccount::where('unit_id', session('active_unit_id'))->get();
+
+        return view('students.show', compact('student', 'reportCards', 'templates', 'issuedDocuments', 'invoices', 'unitSettings', 'activeEnrollment', 'bankAccounts'));
     }
 }
