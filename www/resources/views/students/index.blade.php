@@ -11,11 +11,11 @@
         <div class="mb-4">
             @php
                 $columns = [
-                    ['name' => 'name_avatar', 'label' => 'Nome do Aluno'],
-                    ['name' => 'document', 'label' => 'Documento'],
-                    ['name' => 'contact', 'label' => 'Contato', 'orderable' => false],
-                    ['name' => 'status_badge', 'label' => 'Status', 'searchable' => false],
-                    ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
+                    ['data' => 'name', 'name' => 'name', 'label' => 'Nome do Aluno'],
+                    ['data' => 'document', 'name' => 'document', 'label' => 'Documento'],
+                    ['data' => 'contact', 'name' => 'contact', 'label' => 'Contato', 'orderable' => false, 'searchable' => false],
+                    ['data' => 'status_badge', 'name' => 'status_badge', 'label' => 'Status', 'orderable' => false, 'searchable' => false],
+                    ['data' => 'actions', 'name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
                 ];
             @endphp
             

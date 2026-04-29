@@ -16,7 +16,7 @@ class EmployeeController extends Controller
             $query = Employee::where('unit_id', $unitId)->latest();
             
             return \Yajra\DataTables\Facades\DataTables::of($query)
-                ->addColumn('name_avatar', function($employee) {
+                ->editColumn('name', function($employee) {
                     $initials = substr($employee->name, 0, 2);
                     return '<div class="d-flex align-items-center">
                                 <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold text-uppercase" style="width: 40px; height: 40px;">
@@ -54,7 +54,7 @@ class EmployeeController extends Controller
                         </div>
                     ';
                 })
-                ->rawColumns(['name_avatar', 'status_badge', 'actions'])
+                ->rawColumns(['name', 'status_badge', 'actions'])
                 ->make(true);
         }
 

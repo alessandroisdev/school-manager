@@ -15,7 +15,7 @@ class UnitController extends Controller
             $query = Unit::with('school')->latest();
             
             return \Yajra\DataTables\Facades\DataTables::of($query)
-                ->addColumn('unit_info', function($unit) {
+                ->editColumn('name', function($unit) {
                     return '<div class="fw-bold text-dark mb-0"><i class="bi bi-building me-1"></i> ' . $unit->name . '</div>
                             <div class="small text-muted" style="font-size: 0.75rem;">' . ($unit->school->name ?? 'Matriz') . '</div>';
                 })
@@ -47,7 +47,7 @@ class UnitController extends Controller
                         </div>
                     ';
                 })
-                ->rawColumns(['unit_info', 'contact', 'status_badge', 'actions'])
+                ->rawColumns(['name', 'contact', 'status_badge', 'actions'])
                 ->make(true);
         }
 

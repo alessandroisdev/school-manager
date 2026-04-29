@@ -14,10 +14,10 @@
         <div class="mb-4">
             @php
                 $columns = [
-                    ['name' => 'unit_info', 'label' => 'Nome da Unidade'],
-                    ['name' => 'contact', 'label' => 'Contato', 'searchable' => false],
-                    ['name' => 'status_badge', 'label' => 'Status', 'searchable' => false],
-                    ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
+                    ['data' => 'name', 'name' => 'name', 'label' => 'Nome da Unidade'],
+                    ['data' => 'contact', 'name' => 'contact', 'label' => 'Contato', 'orderable' => false, 'searchable' => false],
+                    ['data' => 'status_badge', 'name' => 'status_badge', 'label' => 'Status', 'orderable' => false, 'searchable' => false],
+                    ['data' => 'actions', 'name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
                 ];
             @endphp
             
