@@ -21,4 +21,10 @@ Route::middleware('auth')->group(function () {
     // Todas as rotas do painel
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('students', \App\Interfaces\Http\Controllers\StudentController::class);
+
+    // Módulo Financeiro
+    Route::prefix('finance')->name('finance.')->group(function () {
+        Route::get('/invoices', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::patch('/invoices/{invoice}/pay', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'pay'])->name('invoices.pay');
+    });
 });
