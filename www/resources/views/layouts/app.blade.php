@@ -35,10 +35,15 @@
                 </a>
             </li>
             
-            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Secretaria</h6>
+            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Secretaria Central</h6>
             <li>
                 <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.*') ? 'active' : '' }}">
-                    <i class="bi bi-people me-2"></i> Gestão de Alunos
+                    <i class="bi bi-person-lines-fill me-2"></i> Gestão de Alunos
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('enrollments.index') }}" class="nav-link {{ request()->routeIs('enrollments.*') ? 'active' : '' }}">
+                    <i class="bi bi-link-45deg me-2"></i> Matrículas
                 </a>
             </li>
 
@@ -49,15 +54,15 @@
                 </a>
             </li>
 
-            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Pedagógico</h6>
+            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Módulo Pedagógico</h6>
             <li>
                 <a href="{{ route('academic.grades.index') }}" class="nav-link {{ request()->routeIs('academic.grades.*') ? 'active' : '' }}">
-                    <i class="bi bi-bookmark me-2"></i> Séries e Anos
+                    <i class="bi bi-mortarboard me-2"></i> Séries e Anos
                 </a>
             </li>
             <li>
                 <a href="{{ route('academic.shifts.index') }}" class="nav-link {{ request()->routeIs('academic.shifts.*') ? 'active' : '' }}">
-                    <i class="bi bi-clock me-2"></i> Turnos
+                    <i class="bi bi-clock-history me-2"></i> Turnos
                 </a>
             </li>
             <li>
@@ -68,6 +73,11 @@
             <li>
                 <a href="{{ route('academic.subjects.index') }}" class="nav-link {{ request()->routeIs('academic.subjects.*') ? 'active' : '' }}">
                     <i class="bi bi-book-half me-2"></i> Disciplinas
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('academic.assignments.index') }}" class="nav-link {{ request()->routeIs('academic.assignments.*') ? 'active' : '' }}">
+                    <i class="bi bi-diagram-3-fill me-2"></i> Alocação Docente
                 </a>
             </li>
 

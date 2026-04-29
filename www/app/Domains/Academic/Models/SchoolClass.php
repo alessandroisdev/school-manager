@@ -47,4 +47,9 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Enrollment::class);
     }
+
+    public function teacherAssignments(): HasMany
+    {
+        return $this->hasMany(TeacherAssignment::class);
+    }
 }
