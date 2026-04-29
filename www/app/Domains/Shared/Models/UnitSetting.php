@@ -9,6 +9,7 @@ class UnitSetting extends Model
 {
     protected $fillable = [
         'unit_id',
+        'school_type',
         'calculation_rule',
         'passing_grade',
         'passing_attendance',

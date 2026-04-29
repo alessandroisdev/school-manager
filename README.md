@@ -17,7 +17,8 @@ O **SGE (Sistema de Gestão Escolar)** é uma aplicação SaaS desenvolvida em *
 - 🧠 **Automação Pedagógica (IA):**
   - _Assistente de Enturmação:_ Algoritmo matemático _Round-Robin_ que pega uma fila de alunos recém-matriculados e os divide homogeneamente entre as turmas existentes, respeitando o limite físico (capacity) das salas.
 - 📝 **Diário de Classe do Professor:** Interface focada em produtividade. O professor faz a Chamada (Frequência) de todos os alunos em lote, e lança notas vinculadas a avaliações cadastradas.
-- 💰 **Módulo Financeiro:** Faturamento, gerenciamento de Mensalidades, baixa de boletos e multas baseadas nas configurações globais da Unidade.
+- 💰 **Módulo Financeiro:** Suporte Híbrido (Escola Pública ou Particular). Faturamento, geração de **Carnês Anuais** via integração com `OpenBoleto` (com suporte a QRCode Pix e multas parametrizáveis), além de precificação diferenciada por Turma/Turno.
+- 👨‍👩‍👧 **Portal do Responsável:** Acesso seguro em painel próprio para os pais visualizarem múltiplos filhos simultaneamente. Integra exibição de Boletins (Notas e Frequência), histórico financeiro (Faturas com impressão de Boletos/Pix em casa) e um Mural de Comunicados segmentado.
 - 🏛️ **Comunicação Oficial (Governança):** Motor avançado de redação de documentos (Ofícios, Portarias) configurado em layout A4 com geração de PDFs seguindo o _Manual de Redação da Presidência da República_ (Padrão ABNT). Possui `lockForUpdate` em transações para numerações seguras.
 - 📨 **Protocolo de Recebimento (Inbound):** Central de recebimento com suporte a múltiplos anexos, SLA dinâmico (aviso de prazos estourando) e Widgets de alerta em tempo real no Dashboard.
 - 🖨️ **Geração de Documentos (Individual/Lote):** Possibilidade de gerar atestados, recibos e declarações isoladamente ou gerar em Lote para uma turma inteira, criando históricos de emissão imutáveis na ficha do aluno.

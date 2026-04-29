@@ -190,6 +190,16 @@
                         <i class="bi bi-cash-coin me-2"></i> Faturamento
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('finance.bank-accounts.index') }}" class="nav-link {{ request()->routeIs('finance.bank-accounts.*') ? 'active' : '' }}">
+                        <i class="bi bi-bank me-2"></i> Contas Bancárias
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('finance.class-pricings.index') }}" class="nav-link {{ request()->routeIs('finance.class-pricings.*') ? 'active' : '' }}">
+                        <i class="bi bi-tags me-2"></i> Precificação de Turmas
+                    </a>
+                </li>
                 @endif
             </ul>
         </div>

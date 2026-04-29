@@ -46,6 +46,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link fw-bold" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab" aria-controls="documentos" aria-selected="false"><i class="bi bi-file-earmark-text me-1"></i> Documentos Emitidos</button>
             </li>
+            @if($unitSettings && $unitSettings->school_type === 'private')
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold text-success" id="financeiro-tab" data-bs-toggle="tab" data-bs-target="#financeiro" type="button" role="tab" aria-controls="financeiro" aria-selected="false"><i class="bi bi-currency-dollar me-1"></i> Financeiro</button>
+            </li>
+            @endif
         </ul>
 
         <div class="tab-content" id="studentTabsContent">
@@ -200,6 +205,78 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- ABA FINANCEIRO -->
+            @if($unitSettings && $unitSettings->school_type === 'private')
+            <div class="tab-pane fade d-print-none" id="financeiro" role="tabpanel" aria-labelledby="financeiro-tab">
+                <div class="glass-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">Histórico Financeiro</h5>
+                            <p class="text-muted small mb-0">Controle de faturas, boletos e pagamentos do aluno.</p>
+                        </div>
+                        <form action="{{ route('finance.carnet.generate') }}" method="POST" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="student_id" value="{{ $student->id }}">
+                            <button type="submit" class="btn btn-success shadow-sm fw-bold">
+                                <i class="bi bi-journal-plus me-1"></i> Gerar Carnê Anual
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Parcela</th>
+                                    <th>Vencimento</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Pagamento</th>
+                                    <th class="text-end">Boleto / Pix</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($invoices as $invoice)
+                                    <tr>
+                                        <td class="fw-bold">{{ str_pad($invoice->installment_number ?? 1, 2, '0', STR_PAD_LEFT) }}/12</td>
+                                        <td>{{ $invoice->due_date->format('d/m/Y') }}
+                                            @if($invoice->status == 'pending' && $invoice->due_date < now())
+                                                <span class="badge bg-danger ms-1">Atrasado</span>
+                                            @endif
+                                        </td>
+                                        <td class="fw-bold text-dark">R$ {{ number_format($invoice->amount, 2, ',', '.') }}</td>
+                                        <td>
+                                            @if($invoice->status == 'paid')
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill">Pago</span>
+                                            @elseif($invoice->status == 'cancelled')
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 rounded-pill">Cancelado</span>
+                                            @else
+                                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2 py-1 rounded-pill">Pendente</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-muted small">
+                                            {{ $invoice->paid_at ? $invoice->paid_at->format('d/m/Y H:i') : '-' }}
+                                        </td>
+                                        <td class="text-end">
+                                            @if($invoice->status != 'cancelled')
+                                                <a href="{{ route('finance.boleto.show', $invoice) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Imprimir Boleto">
+                                                    <i class="bi bi-upc-scan"></i> Visualizar Boleto
+                                                </a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">Nenhuma fatura ou carnê gerado para este aluno.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 

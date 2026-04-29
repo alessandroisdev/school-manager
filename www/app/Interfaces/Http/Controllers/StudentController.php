@@ -280,6 +280,12 @@ class StudentController extends Controller
             ->latest()
             ->get();
 
-        return view('students.show', compact('student', 'reportCards', 'templates', 'issuedDocuments'));
+        $invoices = \App\Domains\Finance\Models\Invoice::where('student_id', $student->id)
+            ->orderBy('due_date')
+            ->get();
+            
+        $unitSettings = \App\Domains\Shared\Models\UnitSetting::where('unit_id', session('active_unit_id'))->first();
+
+        return view('students.show', compact('student', 'reportCards', 'templates', 'issuedDocuments', 'invoices', 'unitSettings'));
     }
 }

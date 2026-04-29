@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function () {
     // Portal do Aluno
     Route::get('/student/portal', [\App\Interfaces\Http\Controllers\StudentPortalController::class, 'index'])->name('student.dashboard');
 
+    // Portal do Responsável
+    Route::get('/parent/portal', [\App\Interfaces\Http\Controllers\ParentPortalController::class, 'index'])->name('parent.dashboard');
+
     // Módulo Financeiro
     Route::prefix('finance')->name('finance.')->group(function () {
         Route::get('/invoices', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'index'])->name('invoices.index');
@@ -127,5 +130,17 @@ Route::middleware('auth')->group(function () {
     Route::prefix('hr')->name('hr.')->group(function () {
         Route::resource('employees', \App\Interfaces\Http\Controllers\HR\EmployeeController::class)->except(['show']);
         Route::resource('teachers', \App\Interfaces\Http\Controllers\HR\TeacherController::class)->except(['show']);
+    });
+
+    // Módulo Financeiro
+    Route::prefix('finance')->name('finance.')->group(function () {
+        Route::post('carnet/generate', [\App\Interfaces\Http\Controllers\Finance\CarnetController::class, 'generate'])->name('carnet.generate');
+        Route::get('boleto/{invoice}', [\App\Interfaces\Http\Controllers\Finance\BoletoController::class, 'show'])->name('boleto.show');
+        
+        // Cadastros Financeiros (Apenas Admin/Direção)
+        Route::middleware(['role:admin|diretor'])->group(function() {
+            Route::resource('bank-accounts', \App\Interfaces\Http\Controllers\Finance\BankAccountController::class);
+            Route::resource('class-pricings', \App\Interfaces\Http\Controllers\Finance\ClassPricingController::class);
+        });
     });
 });
