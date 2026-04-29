@@ -22,7 +22,7 @@ class TeacherController extends Controller
             return \Yajra\DataTables\Facades\DataTables::of($query)
                 ->addColumn('name_avatar', function($teacher) {
                     $employee = $teacher->employee;
-                    $initials = substr($employee->name, 0, 2);
+                    $initials = mb_substr($employee->name, 0, 2, 'UTF-8');
                     return '<div class="d-flex align-items-center">
                                 <div class="rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center fw-bold text-uppercase" style="width: 40px; height: 40px;">
                                     ' . $initials . '

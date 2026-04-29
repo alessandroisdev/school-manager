@@ -17,7 +17,7 @@ class SubjectController extends Controller
             
             return \Yajra\DataTables\Facades\DataTables::of($query)
                 ->addColumn('name_avatar', function($subject) {
-                    $initials = substr($subject->name, 0, 2);
+                    $initials = mb_substr($subject->name, 0, 2, 'UTF-8');
                     return '<div class="d-flex align-items-center">
                                 <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold text-uppercase" style="width: 40px; height: 40px;">
                                     ' . $initials . '
