@@ -113,5 +113,29 @@
         {{ $slot }}
     </main>
     
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                window.Toast.fire({
+                    icon: 'success',
+                    title: "{{ session('success') }}"
+                });
+            @endif
+
+            @if (session('error'))
+                window.Toast.fire({
+                    icon: 'error',
+                    title: "{{ session('error') }}"
+                });
+            @endif
+
+            @if ($errors->any())
+                window.Toast.fire({
+                    icon: 'error',
+                    title: "Existem erros de validação!"
+                });
+            @endif
+        });
+    </script>
 </body>
 </html>

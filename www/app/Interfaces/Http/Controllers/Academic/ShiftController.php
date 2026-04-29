@@ -33,7 +33,7 @@ class ShiftController extends Controller
                     return '
                         <div class="text-end text-nowrap">
                             <a href="' . $editUrl . '" class="btn btn-sm btn-light text-primary fw-bold me-2"><i class="bi bi-pencil-square"></i> Editar</a>
-                            <form action="' . $deleteUrl . '" method="POST" class="d-inline-block" onsubmit="return confirm(\'Tem certeza que deseja excluir este turno?\');">
+                            <form action="' . $deleteUrl . '" method="POST" class="d-inline-block form-delete">
                                 ' . $csrf . $method . '
                                 <button type="submit" class="btn btn-sm btn-light text-danger fw-bold"><i class="bi bi-trash"></i> Excluir</button>
                             </form>
