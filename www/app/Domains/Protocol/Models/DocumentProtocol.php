@@ -32,7 +32,7 @@ class DocumentProtocol extends Model
 
     public function receiver()
     {
-        return $this->belongsTo(\App\Domains\Shared\Models\User::class, 'received_by_id');
+        return $this->belongsTo(\App\Domains\Auth\Models\User::class, 'received_by_id');
     }
 
     public function attachments()

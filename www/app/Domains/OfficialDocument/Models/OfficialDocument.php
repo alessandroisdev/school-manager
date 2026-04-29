@@ -35,6 +35,6 @@ class OfficialDocument extends Model
 
     public function creator()
     {
-        return $this->belongsTo(\App\Domains\Shared\Models\User::class, 'created_by_id');
+        return $this->belongsTo(\App\Domains\Auth\Models\User::class, 'created_by_id');
     }
 }
