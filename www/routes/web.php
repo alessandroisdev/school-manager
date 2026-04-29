@@ -39,6 +39,11 @@ Route::middleware('auth')->group(function () {
         // Configurações da Unidade
         Route::get('settings', [\App\Interfaces\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
         Route::post('settings', [\App\Interfaces\Http\Controllers\Admin\SettingController::class, 'store'])->name('settings.store');
+
+        // Gestor de Documentos (Isolado por unidade)
+        Route::resource('document-partials', \App\Interfaces\Http\Controllers\Admin\DocumentPartialController::class)->except(['show']);
+        Route::get('document-templates/{document_template}/preview', [\App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class, 'previewPdf'])->name('document-templates.preview');
+        Route::resource('document-templates', \App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class)->except(['show']);
     });
 
     // Módulo Secretaria

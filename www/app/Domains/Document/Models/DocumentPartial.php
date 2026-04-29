@@ -5,20 +5,17 @@ namespace App\Domains\Document\Models;
 use App\Domains\Shared\Models\Unit;
 use App\Infrastructure\Persistence\Traits\HasUnitScope;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class DocumentTemplate extends Model
+class DocumentPartial extends Model
 {
     use SoftDeletes, HasUnitScope;
 
     protected $fillable = [
         'unit_id',
         'name',
-        'type',
-        'header_id',
-        'footer_id',
-        'watermark_path',
+        'type', // header or footer
         'content',
         'is_active',
     ];
@@ -33,15 +30,5 @@ class DocumentTemplate extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
-    }
-
-    public function header(): BelongsTo
-    {
-        return $this->belongsTo(DocumentPartial::class, 'header_id');
-    }
-
-    public function footer(): BelongsTo
-    {
-        return $this->belongsTo(DocumentPartial::class, 'footer_id');
     }
 }

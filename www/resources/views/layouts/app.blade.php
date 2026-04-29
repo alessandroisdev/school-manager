@@ -69,6 +69,16 @@
                         <i class="bi bi-gear-fill me-2"></i> Configurações Globais
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.document-partials.index') }}" class="nav-link {{ request()->routeIs('admin.document-partials.*') ? 'active' : '' }}">
+                        <i class="bi bi-layout-text-window-reverse me-2"></i> Blocos Comuns
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.document-templates.index') }}" class="nav-link {{ request()->routeIs('admin.document-templates.*') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-richtext me-2"></i> Templates (Contratos)
+                    </a>
+                </li>
                 @endif
                 
                 @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor') || auth()->user()->hasRole('secretaria'))
