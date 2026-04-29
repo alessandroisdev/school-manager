@@ -65,6 +65,23 @@
                     <i class="bi bi-door-open me-2"></i> Gestão de Turmas
                 </a>
             </li>
+            <li>
+                <a href="{{ route('academic.subjects.index') }}" class="nav-link {{ request()->routeIs('academic.subjects.*') ? 'active' : '' }}">
+                    <i class="bi bi-book-half me-2"></i> Disciplinas
+                </a>
+            </li>
+
+            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Recursos Humanos</h6>
+            <li>
+                <a href="{{ route('hr.employees.index') }}" class="nav-link {{ request()->routeIs('hr.employees.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-vcard me-2"></i> Colaboradores
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('hr.teachers.index') }}" class="nav-link {{ request()->routeIs('hr.teachers.*') ? 'active' : '' }}">
+                    <i class="bi bi-journal-bookmark-fill me-2"></i> Corpo Docente
+                </a>
+            </li>
         </ul>
 
         <hr class="border-secondary">

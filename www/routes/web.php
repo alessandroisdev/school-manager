@@ -33,5 +33,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('grades', \App\Interfaces\Http\Controllers\Academic\GradeController::class)->except(['show']);
         Route::resource('shifts', \App\Interfaces\Http\Controllers\Academic\ShiftController::class)->except(['show']);
         Route::resource('classes', \App\Interfaces\Http\Controllers\Academic\SchoolClassController::class)->except(['show']);
+        Route::resource('subjects', \App\Interfaces\Http\Controllers\Academic\SubjectController::class)->except(['show']);
+    });
+
+    // Módulo de Recursos Humanos (Colaboradores e Professores)
+    Route::prefix('hr')->name('hr.')->group(function () {
+        Route::resource('employees', \App\Interfaces\Http\Controllers\HR\EmployeeController::class)->except(['show']);
+        Route::resource('teachers', \App\Interfaces\Http\Controllers\HR\TeacherController::class)->except(['show']);
     });
 });
