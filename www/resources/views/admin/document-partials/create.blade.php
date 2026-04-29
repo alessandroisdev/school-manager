@@ -15,7 +15,7 @@
             <form action="{{ route('admin.document-partials.store') }}" method="POST">
                 @csrf
                 <div class="row g-3">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <label class="form-label fw-bold text-muted small">Nome Identificador *</label>
                         <input type="text" name="name" class="form-control bg-light border-0" required placeholder="Ex: Cabeçalho Padrão com CNPJ">
                     </div>
@@ -28,9 +28,16 @@
                         </select>
                     </div>
 
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" role="switch" id="isActive" name="is_active" value="1" checked>
+                            <label class="form-check-label fw-bold text-muted small" for="isActive">Ativo</label>
+                        </div>
+                    </div>
+
                     <div class="col-md-12">
                         <label class="form-label fw-bold text-muted small">Conteúdo do Bloco (HTML) *</label>
-                        <textarea name="content" id="html-editor" class="form-control" rows="10"></textarea>
+                        <textarea name="content" id="html-editor" class="form-control"></textarea>
                     </div>
                 </div>
 
@@ -44,18 +51,47 @@
     </div>
 
     @stack('scripts')
-    <!-- TinyMCE CDN -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- TinyMCE Open Source (Sem aviso de API Key) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             tinymce.init({
                 selector: '#html-editor',
-                height: 300,
-                menubar: false,
+                height: 400,
+                menubar: 'file edit view insert format tools table',
                 plugins: 'lists link image table code help wordcount',
-                toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | table image | code | removeformat',
+                toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table image | code',
                 content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                language: 'pt_BR'
+                language: 'pt_BR',
+                promotion: false, 
+                branding: false,
+                convert_urls: false, // <-- Impede o TinyMCE de transformar /storage em ../../storage
+                
+                // Configuração de Upload de Imagens
+                images_upload_handler: function (blobInfo, progress) {
+                    return new Promise((resolve, reject) => {
+                        const formData = new FormData();
+                        formData.append('image', blobInfo.blob(), blobInfo.filename());
+                        formData.append('_token', '{{ csrf_token() }}');
+
+                        fetch('{{ route('admin.upload.image') }}', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.url) {
+                                resolve(data.url);
+                            } else {
+                                reject('Erro no upload.');
+                            }
+                        })
+                        .catch(err => {
+                            reject('Falha de rede.');
+                        });
+                    });
+                }
             });
         });
     </script>

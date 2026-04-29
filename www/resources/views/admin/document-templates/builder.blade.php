@@ -72,7 +72,7 @@
                 <div class="col-lg-3">
                     <div class="glass-card p-4 sticky-top" style="top: 100px;">
                         <h6 class="fw-bold text-primary mb-3"><i class="bi bi-lightning-charge-fill me-1"></i> Variáveis Dinâmicas</h6>
-                        <p class="small text-muted mb-3">Clique em uma tag para copiá-la. O sistema irá substituí-la automaticamente na geração do PDF.</p>
+                        <p class="small text-muted mb-3">Clique em uma tag para inseri-la diretamente no editor.</p>
                         
                         <div class="mb-3">
                             <span class="d-block text-uppercase fw-bold text-secondary small mb-2">Dados do Aluno</span>
@@ -110,8 +110,9 @@
     </div>
 
     @stack('scripts')
-    <!-- TinyMCE CDN -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- TinyMCE Open Source (Sem aviso de API Key) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             tinymce.init({
@@ -123,31 +124,57 @@
                 content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                 language: 'pt_BR',
                 pagebreak_separator: "<!-- pagebreak -->",
+                promotion: false, // Esconde botão de upgrade
+                branding: false, // Esconde "Powered by TinyMCE"
+                convert_urls: false, // <-- Evita que imagens fiquem com caminhos relativos quebrados (../../storage)
+                
+                // Configuração de Upload de Imagens
+                images_upload_handler: function (blobInfo, progress) {
+                    return new Promise((resolve, reject) => {
+                        const formData = new FormData();
+                        formData.append('image', blobInfo.blob(), blobInfo.filename());
+                        formData.append('_token', '{{ csrf_token() }}');
+
+                        fetch('{{ route('admin.upload.image') }}', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.url) {
+                                resolve(data.url);
+                            } else {
+                                reject('Erro no upload.');
+                            }
+                        })
+                        .catch(err => {
+                            reject('Falha de rede.');
+                        });
+                    });
+                }
             });
 
-            // Lógica para clicar no botão da tag e copiar para o clipboard (ou tentar inserir no editor)
+            // Lógica para clicar no botão da tag e inserir no editor
             document.querySelectorAll('.tag-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
                     const tag = this.getAttribute('data-tag');
                     
-                    // Copia pro clipboard
-                    navigator.clipboard.writeText(tag).then(() => {
-                        const originalText = this.innerHTML;
-                        this.innerHTML = '<i class="bi bi-check2"></i> Copiado!';
-                        this.classList.replace('btn-outline-secondary', 'btn-success');
-                        this.classList.add('text-white');
-                        
-                        // Tenta inserir direto no TinyMCE onde o cursor estava
-                        if (tinymce.activeEditor) {
-                            tinymce.activeEditor.execCommand('mceInsertContent', false, tag);
-                        }
-                        
-                        setTimeout(() => {
-                            this.innerHTML = originalText;
-                            this.classList.replace('btn-success', 'btn-outline-secondary');
-                            this.classList.remove('text-white');
-                        }, 1500);
-                    });
+                    // Insere no editor
+                    if (tinymce.activeEditor) {
+                        tinymce.activeEditor.execCommand('mceInsertContent', false, tag);
+                    }
+                    
+                    // Feedback visual
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="bi bi-check2"></i> Inserido!';
+                    this.classList.replace('btn-outline-secondary', 'btn-success');
+                    this.classList.add('text-white');
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.classList.replace('btn-success', 'btn-outline-secondary');
+                        this.classList.remove('text-white');
+                    }, 1000);
                 });
             });
         });

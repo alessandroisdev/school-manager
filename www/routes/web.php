@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
         Route::get('settings', [\App\Interfaces\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
         Route::post('settings', [\App\Interfaces\Http\Controllers\Admin\SettingController::class, 'store'])->name('settings.store');
 
+        // Upload genérico de Imagens (WYSIWYG)
+        Route::post('upload-image', [\App\Interfaces\Http\Controllers\Admin\UploadController::class, 'uploadImage'])->name('upload.image');
+
         // Gestor de Documentos (Isolado por unidade)
         Route::resource('document-partials', \App\Interfaces\Http\Controllers\Admin\DocumentPartialController::class)->except(['show']);
         Route::get('document-templates/{document_template}/preview', [\App\Interfaces\Http\Controllers\Admin\DocumentTemplateController::class, 'previewPdf'])->name('document-templates.preview');
