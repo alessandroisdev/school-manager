@@ -30,5 +30,6 @@ class BoletoController extends Controller
         } catch (\Exception $e) {
             return back()->with('warning', 'Erro ao gerar boleto: ' . $e->getMessage());
         }
+
     }
 }

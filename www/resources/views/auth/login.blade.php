@@ -19,7 +19,7 @@
 
         <div class="d-grid gap-2 mt-4">
             <button class="btn btn-primary btn-lg fw-bold rounded-3 shadow-sm" type="submit">
-                Acessar o SGE
+                Acessar
             </button>
         </div>
     </form>
