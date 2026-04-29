@@ -54,7 +54,7 @@ class CompleteSchoolSeeder extends Seeder
         ]);
 
         // Vincula as unidades ao Admin
-        $admin = User::where('email', 'admin@escola.com')->first();
+        $admin = User::where('email', 'admin@schoolmanager.com')->first();
         if ($admin) {
             $admin->units()->syncWithoutDetaching([$unitFundamental->id, $unitMedio->id]);
         }
