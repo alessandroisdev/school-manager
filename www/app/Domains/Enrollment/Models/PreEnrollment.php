@@ -4,7 +4,7 @@ namespace App\Domains\Enrollment\Models;
 
 use App\Domains\Academic\Models\Grade;
 use App\Domains\Shared\Models\Unit;
-use App\Traits\HasUnitScope;
+use App\Infrastructure\Persistence\Traits\HasUnitScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
