@@ -3,47 +3,57 @@
         
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h3 mb-0 text-dark fw-bold">Painel Financeiro</h2>
+            <!-- No futuro: Botão de gerar faturas em lote -->
+            <button class="btn btn-outline-secondary fw-bold shadow-sm" disabled>
+                <i class="bi bi-file-earmark-plus me-1"></i> Gerar Faturas (Em breve)
+            </button>
         </div>
 
-        <!-- Estatísticas (Overview) -->
+        <!-- Indicadores Financeiros (Cards) -->
         <div class="row g-4 mb-4">
-            <div class="col-md-6">
-                <div class="glass-card d-flex align-items-center">
-                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-4" style="width: 60px; height: 60px;">
-                        <i class="bi bi-hourglass-split fs-3"></i>
+            <!-- Total Pendente / Atrasado -->
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-card p-4 border-start border-warning border-4 h-100 position-relative overflow-hidden">
+                    <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                        <i class="bi bi-exclamation-triangle-fill fs-1 text-warning"></i>
                     </div>
-                    <div>
-                        <p class="text-muted mb-1 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">A Receber / Atrasado</p>
-                        <h3 class="mb-0 fw-black text-dark">R$ {{ number_format($totalPending, 2, ',', '.') }}</h3>
-                    </div>
+                    <h6 class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Inadimplência / Pendente</h6>
+                    <h3 class="fw-bold text-dark mb-0">R$ {{ number_format($totalPending, 2, ',', '.') }}</h3>
+                    <div class="small text-muted mt-2">Soma de todas as faturas não pagas</div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="glass-card d-flex align-items-center">
-                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-4" style="width: 60px; height: 60px;">
-                        <i class="bi bi-graph-up-arrow fs-3"></i>
+            <!-- Total Recebido no Mês -->
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-card p-4 border-start border-success border-4 h-100 position-relative overflow-hidden">
+                    <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                        <i class="bi bi-cash-stack fs-1 text-success"></i>
                     </div>
-                    <div>
-                        <p class="text-muted mb-1 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Recebido neste mês</p>
-                        <h3 class="mb-0 fw-black text-dark">R$ {{ number_format($totalReceived, 2, ',', '.') }}</h3>
-                    </div>
+                    <h6 class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Receita do Mês</h6>
+                    <h3 class="fw-bold text-success mb-0">R$ {{ number_format($totalReceived, 2, ',', '.') }}</h3>
+                    <div class="small text-muted mt-2">Pagamentos liquidados em {{ now()->translatedFormat('F/Y') }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="mb-4">
-            @php
-                $columns = [
-                    ['name' => 'student_class', 'label' => 'Aluno & Turma'],
-                    ['name' => 'due_date_formatted', 'label' => 'Vencimento', 'searchable' => false],
-                    ['name' => 'amount_formatted', 'label' => 'Valor', 'searchable' => false],
-                    ['name' => 'status_badge', 'label' => 'Status', 'searchable' => false, 'orderable' => false],
-                    ['name' => 'actions', 'label' => 'Ações', 'orderable' => false, 'searchable' => false]
-                ];
-            @endphp
-            
-            <x-datatable id="invoicesTable" url="{{ route('finance.invoices.index') }}" :columns="$columns" />
+        <!-- Tabela de Faturas -->
+        <div class="glass-card p-0 overflow-hidden">
+            <div class="p-4 bg-light border-bottom">
+                <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-receipt me-2"></i> Mensalidades e Cobranças</h5>
+            </div>
+            <div class="p-4">
+                @php
+                    $columns = [
+                        ['name' => 'student_class', 'label' => 'Aluno e Turma'],
+                        ['name' => 'due_date_formatted', 'label' => 'Vencimento', 'searchable' => false],
+                        ['name' => 'amount_formatted', 'label' => 'Valor', 'searchable' => false],
+                        ['name' => 'status_badge', 'label' => 'Status', 'searchable' => false],
+                        ['name' => 'actions', 'label' => 'Pagamento', 'orderable' => false, 'searchable' => false]
+                    ];
+                @endphp
+                
+                <x-datatable id="invoicesTable" url="{{ route('finance.invoices.index') }}" :columns="$columns" />
+            </div>
         </div>
     </div>
 </x-app-layout>

@@ -40,6 +40,19 @@ Route::middleware('auth')->group(function () {
         Route::resource('classes', \App\Interfaces\Http\Controllers\Academic\SchoolClassController::class)->except(['show']);
         Route::resource('subjects', \App\Interfaces\Http\Controllers\Academic\SubjectController::class)->except(['show']);
         Route::resource('assignments', \App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class)->except(['show', 'edit', 'update']);
+
+        // Diário de Classe (Professor)
+        Route::prefix('diary')->name('diary.')->group(function () {
+            Route::get('/', [\App\Interfaces\Http\Controllers\Academic\TeacherPortalController::class, 'index'])->name('index');
+            
+            // Frequência
+            Route::get('/{assignment}/lessons', [\App\Interfaces\Http\Controllers\Academic\LessonController::class, 'index'])->name('lessons');
+            Route::post('/{assignment}/lessons', [\App\Interfaces\Http\Controllers\Academic\LessonController::class, 'store'])->name('lessons.store');
+            
+            // Notas
+            Route::get('/{assignment}/evaluations', [\App\Interfaces\Http\Controllers\Academic\EvaluationController::class, 'index'])->name('evaluations');
+            Route::post('/{assignment}/evaluations', [\App\Interfaces\Http\Controllers\Academic\EvaluationController::class, 'store'])->name('evaluations.store');
+        });
     });
 
     // Módulo de Recursos Humanos (Colaboradores e Professores)

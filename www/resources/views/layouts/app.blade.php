@@ -80,6 +80,11 @@
                     <i class="bi bi-diagram-3-fill me-2"></i> Alocação Docente
                 </a>
             </li>
+            <li>
+                <a href="{{ route('academic.diary.index') }}" class="nav-link {{ request()->routeIs('academic.diary.*') ? 'active' : '' }}">
+                    <i class="bi bi-journal-text me-2"></i> Diário do Professor
+                </a>
+            </li>
 
             <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Recursos Humanos</h6>
             <li>
@@ -90,6 +95,13 @@
             <li>
                 <a href="{{ route('hr.teachers.index') }}" class="nav-link {{ request()->routeIs('hr.teachers.*') ? 'active' : '' }}">
                     <i class="bi bi-journal-bookmark-fill me-2"></i> Corpo Docente
+                </a>
+            </li>
+
+            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Financeiro</h6>
+            <li>
+                <a href="{{ route('finance.invoices.index') }}" class="nav-link {{ request()->routeIs('finance.invoices.*') ? 'active' : '' }}">
+                    <i class="bi bi-cash-coin me-2"></i> Faturamento
                 </a>
             </li>
         </ul>
