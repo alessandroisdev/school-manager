@@ -58,6 +58,12 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('students', \App\Interfaces\Http\Controllers\StudentController::class);
         Route::resource('enrollments', \App\Interfaces\Http\Controllers\EnrollmentController::class)->except(['show', 'edit', 'update']);
+        
+        // Emissão e Gestão de Documentos do Aluno
+        Route::post('issued-documents', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'store'])->name('issued-documents.store');
+        Route::get('issued-documents/{issuedDocument}', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'show'])->name('issued-documents.show');
+        Route::post('issued-documents/{issuedDocument}/cancel', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'cancel'])->name('issued-documents.cancel');
+        Route::post('issued-documents/{issuedDocument}/rectify', [\App\Interfaces\Http\Controllers\Secretariat\IssuedDocumentController::class, 'rectify'])->name('issued-documents.rectify');
     });
 
     // Módulo Acadêmico / Pedagógico
@@ -69,6 +75,8 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('grades', \App\Interfaces\Http\Controllers\Academic\GradeController::class)->except(['show']);
         Route::resource('shifts', \App\Interfaces\Http\Controllers\Academic\ShiftController::class)->except(['show']);
+        Route::get('classes/{class}/batch-documents', [\App\Interfaces\Http\Controllers\Academic\SchoolClassController::class, 'batchDocumentsView'])->name('classes.batch-documents');
+        Route::post('classes/{class}/batch-documents', [\App\Interfaces\Http\Controllers\Academic\SchoolClassController::class, 'batchDocumentsGenerate'])->name('classes.batch-generate');
         Route::resource('classes', \App\Interfaces\Http\Controllers\Academic\SchoolClassController::class)->except(['show']);
         Route::resource('subjects', \App\Interfaces\Http\Controllers\Academic\SubjectController::class)->except(['show']);
         Route::resource('assignments', \App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class)->except(['show', 'edit', 'update']);

@@ -214,6 +214,12 @@ class StudentController extends Controller
             ];
         }
 
-        return view('students.show', compact('student', 'reportCards'));
+        $templates = \App\Domains\Document\Models\DocumentTemplate::where('unit_id', session('active_unit_id'))->get();
+        $issuedDocuments = \App\Domains\Document\Models\IssuedDocument::with(['template', 'issuer', 'rectifiedBy'])
+            ->where('student_id', $student->id)
+            ->latest()
+            ->get();
+
+        return view('students.show', compact('student', 'reportCards', 'templates', 'issuedDocuments'));
     }
 }

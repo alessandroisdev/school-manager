@@ -38,84 +38,199 @@
             </div>
         </div>
 
-        @forelse($reportCards as $report)
-            <div class="row g-4 mb-4">
-                <div class="col-12">
-                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-0">
-                        <i class="bi bi-mortarboard me-2 text-primary"></i> 
-                        {{ $report['enrollment']->schoolClass->name }} 
-                        <span class="small text-muted fw-normal ms-2">({{ $report['enrollment']->schoolClass->grade->name }} / {{ $report['enrollment']->schoolClass->shift->name }})</span>
-                    </h5>
-                </div>
+        <!-- Navegação em Abas -->
+        <ul class="nav nav-tabs mb-4 d-print-none" id="studentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-bold" id="boletim-tab" data-bs-toggle="tab" data-bs-target="#boletim" type="button" role="tab" aria-controls="boletim" aria-selected="true"><i class="bi bi-mortarboard me-1"></i> Desempenho Acadêmico</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab" aria-controls="documentos" aria-selected="false"><i class="bi bi-file-earmark-text me-1"></i> Documentos Emitidos</button>
+            </li>
+        </ul>
 
-                <!-- Resumo -->
-                <div class="col-md-4">
-                    <div class="glass-card p-4 text-center h-100">
-                        <h6 class="text-muted fw-bold mb-3 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Frequência Global</h6>
-                        @php
-                            $freqColor = $report['global_attendance'] >= 75 ? 'success' : 'danger';
-                        @endphp
-                        <div class="display-4 fw-bold text-{{ $freqColor }} mb-2">
-                            {{ $report['global_attendance'] }}%
+        <div class="tab-content" id="studentTabsContent">
+            <!-- ABA BOLETIM -->
+            <div class="tab-pane fade show active" id="boletim" role="tabpanel" aria-labelledby="boletim-tab">
+                @forelse($reportCards as $report)
+                    <div class="row g-4 mb-4">
+                        <div class="col-12">
+                            <h5 class="fw-bold text-dark border-bottom pb-2 mb-0">
+                                <i class="bi bi-mortarboard me-2 text-primary"></i> 
+                                {{ $report['enrollment']->schoolClass->name }} 
+                                <span class="small text-muted fw-normal ms-2">({{ $report['enrollment']->schoolClass->grade->name }} / {{ $report['enrollment']->schoolClass->shift->name }})</span>
+                            </h5>
                         </div>
-                        <div class="text-muted small">
-                            Total de <strong>{{ $report['total_absences'] }}</strong> faltas no período.
+
+                        <!-- Resumo -->
+                        <div class="col-md-4">
+                            <div class="glass-card p-4 text-center h-100">
+                                <h6 class="text-muted fw-bold mb-3 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Frequência Global</h6>
+                                @php
+                                    $freqColor = $report['global_attendance'] >= 75 ? 'success' : 'danger';
+                                @endphp
+                                <div class="display-4 fw-bold text-{{ $freqColor }} mb-2">
+                                    {{ $report['global_attendance'] }}%
+                                </div>
+                                <div class="text-muted small">
+                                    Total de <strong>{{ $report['total_absences'] }}</strong> faltas no período.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Matriz Curricular -->
+                        <div class="col-md-8">
+                            <div class="glass-card p-0 overflow-hidden h-100">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="ps-4 py-3">Disciplina</th>
+                                                <th class="text-center py-3">Aulas Dadas</th>
+                                                <th class="text-center py-3">Faltas</th>
+                                                <th class="text-center py-3 pe-4">Nota Acumulada</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($report['subjects'] as $subject)
+                                                <tr>
+                                                    <td class="ps-4 fw-bold text-dark py-3">
+                                                        {{ $subject['subject_name'] }}
+                                                    </td>
+                                                    <td class="text-center py-3 text-muted">
+                                                        {{ $subject['lessons_count'] }}
+                                                    </td>
+                                                    <td class="text-center py-3">
+                                                        @if($subject['absences'] > 0)
+                                                            <span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1">{{ $subject['absences'] }}</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-center py-3 pe-4">
+                                                        @php
+                                                            $scoreColor = $subject['total_score'] >= 6.0 ? 'success' : ($subject['total_score'] > 0 ? 'warning' : 'secondary');
+                                                        @endphp
+                                                        <span class="fw-bold text-{{ $scoreColor }} fs-5">
+                                                            {{ number_format($subject['total_score'], 1, ',', '.') }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @empty
+                    <div class="glass-card p-5 text-center">
+                        <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                        <h5 class="fw-bold text-dark">Nenhuma matrícula ativa</h5>
+                        <p class="text-muted mb-0">Este aluno não está enturmado em nenhuma classe neste ano letivo.</p>
+                    </div>
+                @endforelse
+            </div>
 
-                <!-- Matriz Curricular -->
-                <div class="col-md-8">
-                    <div class="glass-card p-0 overflow-hidden h-100">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="ps-4 py-3">Disciplina</th>
-                                        <th class="text-center py-3">Aulas Dadas</th>
-                                        <th class="text-center py-3">Faltas</th>
-                                        <th class="text-center py-3 pe-4">Nota Acumulada</th>
+            <!-- ABA DOCUMENTOS -->
+            <div class="tab-pane fade d-print-none" id="documentos" role="tabpanel" aria-labelledby="documentos-tab">
+                <div class="glass-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">Documentos Gerados</h5>
+                            <p class="text-muted small mb-0">Histórico inalterável de contratos, recibos e certificados.</p>
+                        </div>
+                        <button type="button" class="btn btn-primary shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalEmitirDocumento">
+                            <i class="bi bi-plus-lg me-1"></i> Emitir Novo
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Cód. Ref.</th>
+                                    <th>Template</th>
+                                    <th>Data de Emissão</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($issuedDocuments as $doc)
+                                    <tr class="{{ $doc->status !== 'valid' ? 'text-muted' : '' }}">
+                                        <td class="fw-bold text-primary">{{ $doc->reference_code }}</td>
+                                        <td>{{ $doc->template ? $doc->template->name : 'Template Removido' }}</td>
+                                        <td>{{ $doc->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>
+                                            @if($doc->status === 'valid')
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill">Válido</span>
+                                            @elseif($doc->status === 'rectified')
+                                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2 py-1 rounded-pill">Retificado</span>
+                                            @else
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 rounded-pill">Cancelado</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ route('issued-documents.show', $doc) }}" target="_blank" class="btn btn-sm btn-light text-primary me-1" title="Ver PDF">
+                                                <i class="bi bi-printer"></i>
+                                            </a>
+                                            @if($doc->status === 'valid')
+                                                <form action="{{ route('issued-documents.rectify', $doc) }}" method="POST" class="d-inline" onsubmit="return confirm('Isso invalidará este documento e gerará um NOVO contrato atualizado. Tem certeza?');">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-light text-warning me-1" title="Retificar (Corrigir)">
+                                                        <i class="bi bi-arrow-repeat"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('issued-documents.cancel', $doc) }}" method="POST" class="d-inline" onsubmit="return confirm('O documento ficará permanentemente marcado como cancelado. Continuar?');">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-light text-danger" title="Cancelar">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($report['subjects'] as $subject)
-                                        <tr>
-                                            <td class="ps-4 fw-bold text-dark py-3">
-                                                {{ $subject['subject_name'] }}
-                                            </td>
-                                            <td class="text-center py-3 text-muted">
-                                                {{ $subject['lessons_count'] }}
-                                            </td>
-                                            <td class="text-center py-3">
-                                                @if($subject['absences'] > 0)
-                                                    <span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1">{{ $subject['absences'] }}</span>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center py-3 pe-4">
-                                                @php
-                                                    $scoreColor = $subject['total_score'] >= 6.0 ? 'success' : ($subject['total_score'] > 0 ? 'warning' : 'secondary');
-                                                @endphp
-                                                <span class="fw-bold text-{{ $scoreColor }} fs-5">
-                                                    {{ number_format($subject['total_score'], 1, ',', '.') }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">Nenhum documento emitido para este aluno.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        @empty
-            <div class="glass-card p-5 text-center">
-                <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-                <h5 class="fw-bold text-dark">Nenhuma matrícula ativa</h5>
-                <p class="text-muted mb-0">Este aluno não está enturmado em nenhuma classe neste ano letivo.</p>
-            </div>
-        @endforelse
+        </div>
+    </div>
+
+    <!-- Modal Emissão Documento -->
+    <div class="modal fade" id="modalEmitirDocumento" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ route('issued-documents.store') }}" method="POST" class="modal-content">
+                @csrf
+                <input type="hidden" name="student_id" value="{{ $student->id }}">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark">Emitir Documento Oficial</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-primary bg-primary bg-opacity-10 border-0 mb-4">
+                        <i class="bi bi-info-circle-fill me-2"></i> Um documento oficial, após emitido, não pode ser editado. Qualquer erro exigirá uma retificação.
+                    </div>
+                    <label class="form-label fw-bold text-muted small">Selecione o Template (Contrato / Recibo)</label>
+                    <select name="document_template_id" class="form-select bg-light border-0" required>
+                        <option value="">-- Escolha um modelo --</option>
+                        @foreach($templates as $template)
+                            <option value="{{ $template->id }}">{{ $template->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light fw-bold text-muted" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4">Gerar PDF Congelado</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Adiciona CSS Print para melhorar a versão impressa do Boletim -->

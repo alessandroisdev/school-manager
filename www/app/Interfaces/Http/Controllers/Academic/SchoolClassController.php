@@ -44,6 +44,7 @@ class SchoolClassController extends Controller
 
                     return '
                         <div class="text-end text-nowrap">
+                            <a href="' . route('academic.classes.batch-documents', $class) . '" class="btn btn-sm btn-light text-warning fw-bold me-2" title="Emitir Contratos em Lote"><i class="bi bi-files"></i> Lote</a>
                             <a href="' . $editUrl . '" class="btn btn-sm btn-light text-primary fw-bold me-2"><i class="bi bi-pencil-square"></i> Editar</a>
                             <form action="' . $deleteUrl . '" method="POST" class="d-inline-block form-delete">
                                 ' . $csrf . $method . '
@@ -118,5 +119,47 @@ class SchoolClassController extends Controller
     {
         $class->delete();
         return redirect()->route('academic.classes.index')->with('success', 'Turma removida com sucesso!');
+    }
+
+    public function batchDocumentsView(SchoolClass $class)
+    {
+        // Verifica autorização
+        if ($class->unit_id != session('active_unit_id')) abort(403);
+
+        $templates = \App\Domains\Document\Models\DocumentTemplate::where('unit_id', session('active_unit_id'))->get();
+        $enrollments = \App\Domains\Enrollment\Models\Enrollment::with('student')
+            ->where('school_class_id', $class->id)
+            ->whereIn('status', ['active', 'ativa'])
+            ->get();
+
+        return view('academic.classes.batch', compact('class', 'templates', 'enrollments'));
+    }
+
+    public function batchDocumentsGenerate(Request $request, SchoolClass $class, \App\Domains\Document\Services\DocumentEngineService $engine)
+    {
+        if ($class->unit_id != session('active_unit_id')) abort(403);
+
+        $request->validate([
+            'document_template_id' => 'required|exists:document_templates,id',
+            'student_ids' => 'required|array|min:1',
+            'student_ids.*' => 'exists:students,id'
+        ]);
+
+        $template = \App\Domains\Document\Models\DocumentTemplate::where('unit_id', session('active_unit_id'))->findOrFail($request->document_template_id);
+        $students = \App\Domains\Enrollment\Models\Student::whereIn('id', $request->student_ids)->get();
+
+        // 1. Generate Individual Documents
+        $htmlContents = [];
+        foreach ($students as $student) {
+            $issuedDoc = $engine->generateForStudent($template, $student);
+            $htmlContents[] = $issuedDoc->content;
+        }
+
+        // 2. Concatenate HTMLs with page break for a single PDF
+        $finalHtml = implode('<div style="page-break-after: always;"></div>', $htmlContents);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($finalHtml)->setPaper('A4', 'portrait');
+
+        return $pdf->download('Emissao_Lote_Turma_' . $class->name . '.pdf');
     }
 }
