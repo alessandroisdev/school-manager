@@ -10,9 +10,13 @@
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
         .sidebar { height: 100vh; max-height: 100vh; background-color: #1e293b; color: #fff; width: 280px; transition: all 0.3s; display: flex; flex-direction: column; overflow: hidden; }
         .sidebar-scrollable { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding-right: 5px; }
-        .sidebar-scrollable::-webkit-scrollbar { width: 6px; }
-        .sidebar-scrollable::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scrollable::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        
+        /* Custom Scrollbar */
+        .sidebar-scrollable::-webkit-scrollbar { width: 8px; }
+        .sidebar-scrollable::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+        .sidebar-scrollable::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .sidebar-scrollable::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
         .sidebar .nav-link { color: #cbd5e1; border-radius: 0.5rem; margin-bottom: 0.25rem; padding: 0.75rem 1rem; font-weight: 500; transition: all 0.2s; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #334155; color: #fff; transform: translateX(4px); }
         .sidebar-brand { font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
@@ -20,6 +24,8 @@
         .topbar { background: #fff; border: 1px solid #e2e8f0; padding: 1rem 1.5rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .glass-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); padding: 1.5rem; }
         .table-responsive { border-radius: 0.5rem; }
+        .unit-dropdown-btn { background: rgba(13, 110, 253, 0.1); color: #0d6efd; border: none; font-weight: 700; border-radius: 50px; padding: 0.5rem 1.5rem; transition: all 0.2s; }
+        .unit-dropdown-btn:hover { background: rgba(13, 110, 253, 0.2); }
     </style>
 </head>
 <body class="d-flex overflow-hidden">
@@ -182,28 +188,41 @@
     <main class="main-content">
         <!-- Topbar -->
         <header class="topbar d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-dark fw-bold text-muted"><i class="bi bi-buildings me-2"></i> Unidade de Ensino</h5>
             <div class="d-flex align-items-center">
+                <h5 class="mb-0 text-dark fw-bold text-muted me-3"><i class="bi bi-buildings me-2"></i> Unidade de Ensino:</h5>
                 @php
                     $availableUnits = auth()->user()->hasRole('admin') ? \App\Domains\Shared\Models\Unit::all() : auth()->user()->units;
+                    $currentUnitName = $availableUnits->firstWhere('id', session('active_unit_id'))?->name ?? 'Selecione a Unidade';
                 @endphp
                 
                 @if($availableUnits->count() > 1)
-                    <form method="POST" action="{{ route('context.switch') }}" class="m-0">
-                        @csrf
-                        <select name="unit_id" onchange="this.form.submit()" class="form-select form-select-sm border-0 bg-primary bg-opacity-10 fw-bold text-primary rounded-pill px-4 py-2 cursor-pointer shadow-sm" style="appearance: auto; padding-right: 2.5rem;">
+                    <div class="dropdown">
+                        <button class="unit-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ $currentUnitName }}
+                        </button>
+                        <ul class="dropdown-menu shadow-sm border-0 mt-2">
                             @foreach($availableUnits as $unit)
-                                <option value="{{ $unit->id }}" {{ session('active_unit_id') == $unit->id ? 'selected' : '' }}>
-                                    {{ $unit->name }}
-                                </option>
+                                <li>
+                                    <form method="POST" action="{{ route('context.switch') }}" class="m-0">
+                                        @csrf
+                                        <input type="hidden" name="unit_id" value="{{ $unit->id }}">
+                                        <button type="submit" class="dropdown-item py-2 {{ session('active_unit_id') == $unit->id ? 'active bg-primary text-white fw-bold' : '' }}">
+                                            {{ $unit->name }}
+                                        </button>
+                                    </form>
+                                </li>
                             @endforeach
-                        </select>
-                    </form>
+                        </ul>
+                    </div>
                 @elseif($availableUnits->count() == 1)
                     <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-4 py-2 fs-6 shadow-sm border border-primary border-opacity-25">{{ $availableUnits->first()->name }}</span>
                 @else
                     <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-4 py-2 fs-6 shadow-sm">Sem Vínculo</span>
                 @endif
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <!-- Outros elementos do Topbar, como notificações, etc. -->
             </div>
         </header>
 

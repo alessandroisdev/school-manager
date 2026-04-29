@@ -13,7 +13,7 @@ use App\Domains\Academic\Models\SchoolClass;
 use App\Domains\Academic\Models\Subject;
 use App\Domains\Auth\Models\User;
 use App\Domains\HR\Models\Teacher;
-use App\Domains\HR\Models\TeacherAssignment;
+use App\Domains\Academic\Models\TeacherAssignment;
 use App\Domains\Enrollment\Models\Student;
 use App\Domains\Enrollment\Models\Enrollment;
 use App\Domains\Finance\Models\Invoice;
@@ -59,6 +59,23 @@ class CompleteSchoolSeeder extends Seeder
             $admin->units()->syncWithoutDetaching([$unitFundamental->id, $unitMedio->id]);
         }
 
+        // Criar Anos Letivos
+        $yearFundamental = \App\Domains\Academic\Models\AcademicYear::create([
+            'unit_id' => $unitFundamental->id,
+            'year' => date('Y'),
+            'start_date' => date('Y-02-01'),
+            'end_date' => date('Y-12-15'),
+            'is_active' => true
+        ]);
+
+        $yearMedio = \App\Domains\Academic\Models\AcademicYear::create([
+            'unit_id' => $unitMedio->id,
+            'year' => date('Y'),
+            'start_date' => date('Y-02-01'),
+            'end_date' => date('Y-12-15'),
+            'is_active' => true
+        ]);
+
         // Configurações
         foreach ([$unitFundamental, $unitMedio] as $unit) {
             UnitSetting::create([
@@ -73,9 +90,11 @@ class CompleteSchoolSeeder extends Seeder
             ]);
         }
 
-        // Turnos
-        $shiftMorning = Shift::create(['name' => 'Manhã', 'start_time' => '07:00', 'end_time' => '12:00']);
-        $shiftAfternoon = Shift::create(['name' => 'Tarde', 'start_time' => '13:00', 'end_time' => '18:00']);
+        // Turnos Fundamental
+        $shiftMorningF = Shift::create(['unit_id' => $unitFundamental->id, 'name' => 'Manhã', 'start_time' => '07:00', 'end_time' => '12:00']);
+        $shiftAfternoonF = Shift::create(['unit_id' => $unitFundamental->id, 'name' => 'Tarde', 'start_time' => '13:00', 'end_time' => '18:00']);
+        // Turnos Médio
+        $shiftMorningM = Shift::create(['unit_id' => $unitMedio->id, 'name' => 'Manhã', 'start_time' => '07:00', 'end_time' => '12:30']);
 
         // ========== FUNDAMENTAL ========== //
         $gradesFundamental = [];
@@ -88,19 +107,19 @@ class CompleteSchoolSeeder extends Seeder
         foreach ($gradesFundamental as $grade) {
             $classesFundamental[] = SchoolClass::create([
                 'unit_id' => $unitFundamental->id,
+                'academic_year_id' => $yearFundamental->id,
                 'grade_id' => $grade->id,
-                'shift_id' => $shiftMorning->id,
+                'shift_id' => $shiftMorningF->id,
                 'name' => 'Turma A',
-                'capacity' => 35,
-                'academic_year' => date('Y')
+                'capacity' => 35
             ]);
             $classesFundamental[] = SchoolClass::create([
                 'unit_id' => $unitFundamental->id,
+                'academic_year_id' => $yearFundamental->id,
                 'grade_id' => $grade->id,
-                'shift_id' => $shiftAfternoon->id,
+                'shift_id' => $shiftAfternoonF->id,
                 'name' => 'Turma B',
-                'capacity' => 35,
-                'academic_year' => date('Y')
+                'capacity' => 35
             ]);
         }
 
@@ -115,11 +134,11 @@ class CompleteSchoolSeeder extends Seeder
         foreach ($gradesMedio as $grade) {
             $classesMedio[] = SchoolClass::create([
                 'unit_id' => $unitMedio->id,
+                'academic_year_id' => $yearMedio->id,
                 'grade_id' => $grade->id,
-                'shift_id' => $shiftMorning->id,
+                'shift_id' => $shiftMorningM->id,
                 'name' => 'Turma A',
-                'capacity' => 40,
-                'academic_year' => date('Y')
+                'capacity' => 40
             ]);
         }
 
@@ -127,7 +146,8 @@ class CompleteSchoolSeeder extends Seeder
         $subjects = ['Matemática', 'Português', 'História', 'Geografia', 'Ciências/Biologia', 'Física', 'Química'];
         $subjectModels = [];
         foreach ($subjects as $sub) {
-            $subjectModels[] = Subject::create(['name' => $sub, 'code' => strtoupper(substr($sub, 0, 3))]);
+            $subjectModels[] = Subject::create(['unit_id' => $unitFundamental->id, 'name' => $sub]);
+            $subjectModels[] = Subject::create(['unit_id' => $unitMedio->id, 'name' => $sub]);
         }
 
         // Professores (5 professores)
@@ -141,16 +161,23 @@ class CompleteSchoolSeeder extends Seeder
             $user->units()->sync([$unitFundamental->id, $unitMedio->id]);
             
             // Assume the role professor exists in db, skipping role assignment for brevity or doing it raw
-            $roleId = DB::table('roles')->where('slug', 'professor')->value('id');
+            $roleId = DB::table('roles')->where('name', 'professor')->value('id');
             if ($roleId) {
                 DB::table('role_user')->insert(['role_id' => $roleId, 'user_id' => $user->id]);
             }
 
-            $teacher = Teacher::create([
+            $employee = \App\Domains\HR\Models\Employee::create([
                 'unit_id' => $unitFundamental->id,
                 'user_id' => $user->id,
                 'name' => $user->name,
                 'document' => '1112223334' . $i,
+                'position' => 'Professor',
+                'is_active' => true
+            ]);
+
+            $teacher = Teacher::create([
+                'employee_id' => $employee->id,
+                'specialty' => 'Geral'
             ]);
 
             // Aloca professor em Turmas e Disciplinas
@@ -159,7 +186,7 @@ class CompleteSchoolSeeder extends Seeder
                     'teacher_id' => $teacher->id,
                     'school_class_id' => $class->id,
                     'subject_id' => $subjectModels[array_rand($subjectModels)]->id,
-                    'academic_year' => date('Y')
+                    'assigned_workload' => 40
                 ]);
             }
         }
@@ -183,8 +210,7 @@ class CompleteSchoolSeeder extends Seeder
             $enrollment = Enrollment::create([
                 'student_id' => $student->id,
                 'school_class_id' => $class->id,
-                'enrollment_date' => now(),
-                'status' => 'active',
+                'status' => \App\Domains\Enrollment\Enums\EnrollmentStatus::Ativa,
             ]);
 
             // Gera faturas (Boletos)
