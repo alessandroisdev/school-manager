@@ -30,4 +30,9 @@ class Teacher extends Model implements AuditableContract
     {
         return $this->hasMany(TeacherAssignment::class);
     }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(\App\Domains\Academic\Models\Subject::class);
+    }
 }

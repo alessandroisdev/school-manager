@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
         Route::post('classes/{class}/batch-documents', [\App\Interfaces\Http\Controllers\Academic\SchoolClassController::class, 'batchDocumentsGenerate'])->name('classes.batch-generate');
         Route::resource('classes', \App\Interfaces\Http\Controllers\Academic\SchoolClassController::class)->except(['show']);
         Route::resource('subjects', \App\Interfaces\Http\Controllers\Academic\SubjectController::class)->except(['show']);
+        Route::post('assignments/auto-allocate', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'autoAllocate'])->name('assignments.auto-allocate');
         Route::post('assignments/generate', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'generate'])->name('assignments.generate');
         Route::post('assignments/publish', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'publish'])->name('assignments.publish');
         Route::post('assignments/clear', [\App\Interfaces\Http\Controllers\Academic\TeacherAssignmentController::class, 'clear'])->name('assignments.clear');

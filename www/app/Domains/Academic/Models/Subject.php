@@ -22,4 +22,9 @@ class Subject extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(\App\Domains\HR\Models\Teacher::class);
+    }
 }

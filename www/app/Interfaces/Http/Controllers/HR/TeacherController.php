@@ -68,7 +68,9 @@ class TeacherController extends Controller
 
     public function create()
     {
-        return view('hr.teachers.create');
+        $unitId = session('active_unit_id');
+        $subjects = \App\Domains\Academic\Models\Subject::where('unit_id', $unitId)->get();
+        return view('hr.teachers.create', compact('subjects'));
     }
 
     public function store(Request $request)
@@ -83,6 +85,8 @@ class TeacherController extends Controller
             'specialty' => 'nullable|string|max:255',
             'max_workload' => 'required|integer|min:1|max:160',
             'is_active' => 'boolean',
+            'subjects' => 'nullable|array',
+            'subjects.*' => 'exists:subjects,id',
         ]);
 
         DB::transaction(function() use ($validated, $unitId) {
@@ -116,6 +120,10 @@ class TeacherController extends Controller
                 'max_workload' => $validated['max_workload'],
             ]);
 
+            if (isset($validated['subjects'])) {
+                $teacher->subjects()->attach($validated['subjects']);
+            }
+
             // 4. Dispatch Event
             event(new \App\Events\TeacherRegisteredEvent($teacher, $validated['email'], $password));
         });
@@ -125,8 +133,10 @@ class TeacherController extends Controller
 
     public function edit(Teacher $teacher)
     {
-        $teacher->load('employee');
-        return view('hr.teachers.edit', compact('teacher'));
+        $teacher->load('employee', 'subjects');
+        $unitId = session('active_unit_id');
+        $subjects = \App\Domains\Academic\Models\Subject::where('unit_id', $unitId)->get();
+        return view('hr.teachers.edit', compact('teacher', 'subjects'));
     }
 
     public function update(Request $request, Teacher $teacher)
@@ -138,6 +148,8 @@ class TeacherController extends Controller
             'specialty' => 'nullable|string|max:255',
             'max_workload' => 'required|integer|min:1|max:160',
             'is_active' => 'boolean',
+            'subjects' => 'nullable|array',
+            'subjects.*' => 'exists:subjects,id',
         ]);
 
         DB::transaction(function() use ($validated, $teacher) {
@@ -152,6 +164,12 @@ class TeacherController extends Controller
                 'specialty' => $validated['specialty'] ?? null,
                 'max_workload' => $validated['max_workload'],
             ]);
+            
+            if (isset($validated['subjects'])) {
+                $teacher->subjects()->sync($validated['subjects']);
+            } else {
+                $teacher->subjects()->sync([]);
+            }
         });
 
         return redirect()->route('hr.teachers.index')->with('success', 'Dados do professor atualizados!');

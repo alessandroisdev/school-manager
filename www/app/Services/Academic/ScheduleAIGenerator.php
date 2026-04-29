@@ -46,31 +46,42 @@ class ScheduleAIGenerator
      */
     public function generateSchedule($teacherId = null)
     {
-        $query = TeacherAssignment::whereHas('schoolClass', function ($q) {
-            $q->where('unit_id', $this->unitId);
-        });
+        $assignments = TeacherAssignment::where('status', 'draft')
+            ->whereHas('schoolClass', function ($q) {
+                $q->where('unit_id', $this->unitId);
+            });
 
         if ($teacherId) {
-            $query->where('teacher_id', $teacherId);
+            $assignments->where('teacher_id', $teacherId);
         }
 
-        $assignments = $query->get();
-        $daysOfWeek = [1, 2, 3, 4, 5]; // Segunda a Sexta
-
+        $assignments = $assignments->get();
         $successCount = 0;
         $warnings = [];
 
+        // Verifica se existem TimeSlots cadastrados
+        $hasTimeSlots = \App\Domains\Academic\Models\TimeSlot::where('unit_id', $this->unitId)->exists();
+        if (!$hasTimeSlots) {
+            return [
+                'success' => false,
+                'warnings' => ['Erro Crítico: Nenhum Horário de Aula (Time Slot) foi cadastrado nesta unidade. Para a IA funcionar, você precisa cadastrar os horários de início e fim de cada aula por turno.']
+            ];
+        }
+
+        $daysOfWeek = [1, 2, 3, 4, 5]; // Segunda a Sexta
+
         foreach ($assignments as $assignment) {
-            $workloadNeeded = $assignment->assigned_workload;
+            // Dividimos por 40 para achar a quantidade de aulas semanais. Se for menor que 1, assume 1.
+            $weeklyLessons = max(1, round($assignment->assigned_workload / 40));
             $classId = $assignment->school_class_id;
             $shiftId = $assignment->schoolClass->shift_id;
             $tId = $assignment->teacher_id;
 
             // Encontrar horários já alocados para abater do workload se estivermos rodando parcialmente
             $alreadyAssigned = Schedule::where('teacher_assignment_id', $assignment->id)->count();
-            $workloadNeeded -= $alreadyAssigned;
+            $weeklyLessons -= $alreadyAssigned;
 
-            if ($workloadNeeded <= 0) {
+            if ($weeklyLessons <= 0) {
                 continue;
             }
 
@@ -81,7 +92,7 @@ class ScheduleAIGenerator
 
             foreach ($daysOfWeek as $day) {
                 foreach ($timeSlots as $slot) {
-                    if ($allocatedForThisAssignment >= $workloadNeeded) {
+                    if ($allocatedForThisAssignment >= $weeklyLessons) {
                         break 2; // Já alocou tudo que precisava para essa assignment
                     }
 
@@ -113,8 +124,11 @@ class ScheduleAIGenerator
                 }
             }
 
-            if ($allocatedForThisAssignment < $workloadNeeded) {
-                $warnings[] = "Não foi possível alocar todas as aulas para {$assignment->teacher->employee->name} na turma {$assignment->schoolClass->name} ({$assignment->subject->name}). Faltaram " . ($workloadNeeded - $allocatedForThisAssignment) . " aulas.";
+            if ($allocatedForThisAssignment < $weeklyLessons) {
+                $teacherName = $assignment->teacher->employee->name ?? 'Professor N/A';
+                $className = $assignment->schoolClass->name ?? 'Turma N/A';
+                $subjectName = $assignment->subject->name ?? 'Disciplina N/A';
+                $warnings[] = "Não foi possível alocar todas as aulas para {$teacherName} na turma {$className} ({$subjectName}). Faltaram " . ($weeklyLessons - $allocatedForThisAssignment) . " aulas na semana.";
             }
         }
 
@@ -151,11 +165,11 @@ class ScheduleAIGenerator
 
         // 2. Turmas com disciplinas faltando (Considerando uma grade ideal genérica ou comparando com as disciplinas ativas)
         // Como o sistema não tem uma 'Grade Curricular Base' forte vinculada por grade, sugerimos com base em disciplinas sem professor
-        $classes = SchoolClass::where('unit_id', $this->unitId)->with('assignments')->get();
-        $allSubjects = \App\Domains\Academic\Models\Subject::where('unit_id', $this->unitId)->where('is_active', true)->get();
+        $classes = SchoolClass::where('unit_id', $this->unitId)->with('teacherAssignments')->get();
+        $allSubjects = \App\Domains\Academic\Models\Subject::where('unit_id', $this->unitId)->get();
 
         foreach ($classes as $class) {
-            $assignedSubjectIds = $class->assignments->pluck('subject_id')->toArray();
+            $assignedSubjectIds = $class->teacherAssignments->pluck('subject_id')->toArray();
             $missingSubjects = [];
             foreach ($allSubjects as $subject) {
                 if (!in_array($subject->id, $assignedSubjectIds)) {
@@ -188,5 +202,53 @@ class ScheduleAIGenerator
             })
             ->where('status', 'draft')
             ->update(['status' => 'published']);
+    }
+
+    /**
+     * Aloca professores automaticamente para disciplinas vazias nas turmas
+     */
+    public function autoAllocateTeachers()
+    {
+        $classes = SchoolClass::where('unit_id', $this->unitId)->with('teacherAssignments')->get();
+        $allSubjects = \App\Domains\Academic\Models\Subject::where('unit_id', $this->unitId)->get();
+        
+        $teachers = Teacher::with(['employee', 'assignments', 'subjects'])->whereHas('employee', function($q) {
+            $q->where('unit_id', $this->unitId)->where('is_active', true);
+        })->get();
+
+        $allocationsCount = 0;
+
+        foreach ($classes as $class) {
+            $assignedSubjectIds = $class->teacherAssignments->pluck('subject_id')->toArray();
+            
+            foreach ($allSubjects as $subject) {
+                if (!in_array($subject->id, $assignedSubjectIds)) {
+                    // Tentar achar um professor disponivel que lecione essa materia
+                    foreach ($teachers as $teacher) {
+                        // Verifica se o professor ensina essa disciplina
+                        if (!$teacher->subjects->contains('id', $subject->id)) {
+                            continue;
+                        }
+
+                        $currentWorkload = TeacherAssignment::where('teacher_id', $teacher->id)->sum('assigned_workload');
+                        if ($currentWorkload + $subject->workload <= $teacher->max_workload) {
+                            
+                            TeacherAssignment::create([
+                                'teacher_id' => $teacher->id,
+                                'school_class_id' => $class->id,
+                                'subject_id' => $subject->id,
+                                'assigned_workload' => $subject->workload,
+                                'status' => 'draft',
+                            ]);
+                            
+                            $allocationsCount++;
+                            break; // Vai para a proxima materia
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $allocationsCount;
     }
 }

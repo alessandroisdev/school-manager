@@ -40,6 +40,25 @@
                         @error('specialty')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
+                    <div class="col-md-12">
+                        <label for="subjects" class="form-label fw-bold text-muted small">Disciplinas que Leciona</label>
+                        <div class="bg-light p-3 rounded-3 border-0">
+                            <div class="row g-2">
+                                @foreach($subjects as $subject)
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="subjects[]" value="{{ $subject->id }}" id="subject_{{ $subject->id }}" {{ in_array($subject->id, old('subjects', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="subject_{{ $subject->id }}">
+                                                {{ $subject->name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('subjects')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                    </div>
+
                     <div class="col-md-4">
                         <label for="max_workload" class="form-label fw-bold text-muted small">Carga Horária Máx. *</label>
                         <div class="input-group">

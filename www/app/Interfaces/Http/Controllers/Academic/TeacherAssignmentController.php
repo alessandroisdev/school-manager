@@ -24,7 +24,7 @@ class TeacherAssignmentController extends Controller
                 $q->where('unit_id', $unitId)->where('is_active', true);
             })->get();
 
-        $subjects = Subject::where('unit_id', $unitId)->where('is_active', true)->get();
+        $subjects = Subject::where('unit_id', $unitId)->get();
 
         $aiService = new \App\Services\Academic\ScheduleAIGenerator($unitId);
         $suggestions = $aiService->getSuggestions();
@@ -34,6 +34,16 @@ class TeacherAssignmentController extends Controller
                      TeacherAssignment::whereHas('schoolClass', function($q) use ($unitId) { $q->where('unit_id', $unitId); })->where('status', 'draft')->exists();
 
         return view('academic.assignments.index', compact('classes', 'teachers', 'shifts', 'subjects', 'suggestions', 'hasDrafts'));
+    }
+
+    public function autoAllocate(Request $request)
+    {
+        $unitId = session('active_unit_id');
+        $aiService = new \App\Services\Academic\ScheduleAIGenerator($unitId);
+        
+        $count = $aiService->autoAllocateTeachers();
+
+        return back()->with('success', "IA concluiu a varredura e criou {$count} novas alocações de disciplinas em rascunho!");
     }
 
     public function generate(Request $request)
@@ -51,7 +61,7 @@ class TeacherAssignmentController extends Controller
         $result = $aiService->generateSchedule($teacherId);
 
         if (count($result['warnings']) > 0) {
-            return back()->with('warning', 'Alocação gerada com ressalvas: ' . implode(" ", $result['warnings']));
+            return back()->with('warning_list', $result['warnings']);
         }
 
         return back()->with('success', 'Rascunho de alocação gerado com sucesso via IA! Revise antes de publicar.');
@@ -83,12 +93,36 @@ class TeacherAssignmentController extends Controller
             'subject_id' => 'required|exists:subjects,id',
         ]);
 
+        $teacher = Teacher::findOrFail($request->teacher_id);
+        $subject = Subject::findOrFail($request->subject_id);
+        
+        $currentWorkload = TeacherAssignment::where('teacher_id', $teacher->id)->sum('assigned_workload');
+        
+        if ($currentWorkload + $subject->workload > $teacher->max_workload) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Carga horária máxima do professor excedida.'
+            ], 422);
+        }
+
+        // Verifica se a turma já tem professor para essa materia
+        $exists = TeacherAssignment::where('school_class_id', $request->school_class_id)
+            ->where('subject_id', $request->subject_id)
+            ->exists();
+            
+        if ($exists) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Esta turma já possui um professor alocado para esta disciplina.'
+            ], 422);
+        }
+
         // Drag and Drop salva direto como draft
         TeacherAssignment::create([
             'teacher_id' => $request->teacher_id,
             'school_class_id' => $request->school_class_id,
             'subject_id' => $request->subject_id,
-            'assigned_workload' => Subject::find($request->subject_id)->workload ?? 40,
+            'assigned_workload' => $subject->workload,
             'status' => 'draft',
         ]);
 

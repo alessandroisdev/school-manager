@@ -19,11 +19,17 @@
                             <i class="bi bi-check-circle me-1"></i> Publicar Grade
                         </button>
                     </form>
+                    <form action="{{ route('academic.assignments.generate') }}" method="POST" class="d-inline mt-2 mt-md-0 ms-0 ms-md-2">
+                        @csrf
+                        <button type="submit" class="btn btn-primary fw-bold shadow-sm" title="Gerar Quadro de Horários">
+                            <i class="bi bi-calendar3 me-1"></i> Gerar Horários
+                        </button>
+                    </form>
                 @else
-                    <form action="{{ route('academic.assignments.generate') }}" method="POST" class="d-inline">
+                    <form action="{{ route('academic.assignments.auto-allocate') }}" method="POST" class="d-inline">
                         @csrf
                         <button type="submit" class="btn btn-primary fw-bold shadow-sm">
-                            <i class="bi bi-magic me-1"></i> Gerar IA
+                            <i class="bi bi-magic me-1"></i> IA Alocação Geral
                         </button>
                     </form>
                 @endif
@@ -35,6 +41,16 @@
         @endif
         @if(session('warning'))
             <div class="alert alert-warning fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>{{ session('warning') }}</div>
+        @endif
+        @if(session('warning_list'))
+            <div class="alert alert-warning shadow-sm border-warning border-opacity-25">
+                <p class="fw-bold mb-2 text-dark"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i> Ocorreram ressalvas durante a geração da Grade:</p>
+                <ul class="mb-0 small text-dark" style="max-height: 200px; overflow-y: auto;">
+                    @foreach(session('warning_list') as $warn)
+                        <li class="mb-1">{{ $warn }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
 
         <div class="row g-4">
@@ -91,23 +107,23 @@
                 <div class="glass-card p-0 overflow-hidden">
                     <div class="table-responsive">
                         <table class="table table-bordered mb-0" style="min-width: 1000px;">
-                            <thead class="bg-light">
+                            <thead class="bg-body-secondary">
                                 <tr>
-                                    <th class="bg-white text-dark p-3" style="width: 250px;">Professores</th>
+                                    <th class="p-3" style="width: 250px;">Professores</th>
                                     @foreach($shifts as $shift)
                                         @php $shiftClasses = $classes->where('shift_id', $shift->id); @endphp
                                         @if($shiftClasses->count() > 0)
-                                            <th colspan="{{ $shiftClasses->count() }}" class="text-center p-3 border-start border-2 border-secondary bg-light">
+                                            <th colspan="{{ $shiftClasses->count() }}" class="text-center p-3 border-start border-2 border-secondary bg-body-tertiary">
                                                 Turno: {{ $shift->name }}
                                             </th>
                                         @endif
                                     @endforeach
                                 </tr>
                                 <tr>
-                                    <th class="bg-white"></th>
+                                    <th></th>
                                     @foreach($shifts as $shift)
                                         @foreach($classes->where('shift_id', $shift->id) as $class)
-                                            <th class="text-center small text-muted bg-white border-start {{ $loop->first ? 'border-2 border-secondary' : '' }}">
+                                            <th class="text-center small text-muted border-start {{ $loop->first ? 'border-2 border-secondary' : '' }}">
                                                 {{ $class->name }} <br><span style="font-size: 0.7rem;">{{ $class->grade->name }}</span>
                                             </th>
                                         @endforeach
@@ -117,8 +133,8 @@
                             <tbody>
                                 @foreach($teachers as $teacher)
                                     <tr>
-                                        <td class="p-3 bg-white align-middle">
-                                            <div class="fw-bold text-dark">{{ $teacher->employee->name }}</div>
+                                        <td class="p-3 align-middle">
+                                            <div class="fw-bold">{{ $teacher->employee->name }}</div>
                                             <div class="small text-muted">{{ $teacher->specialty ?? 'Geral' }} | Max: {{ $teacher->max_workload }}h</div>
                                             <form action="{{ route('academic.assignments.generate') }}" method="POST" class="mt-2">
                                                 @csrf
@@ -128,7 +144,7 @@
                                         </td>
                                         @foreach($shifts as $shift)
                                             @foreach($classes->where('shift_id', $shift->id) as $class)
-                                                <td class="bg-light p-2 kanban-dropzone border-start {{ $loop->first ? 'border-2 border-secondary' : '' }}" 
+                                                <td class="p-2 kanban-dropzone border-start {{ $loop->first ? 'border-2 border-secondary' : '' }}" 
                                                     data-teacher-id="{{ $teacher->id }}" 
                                                     data-class-id="{{ $class->id }}"
                                                     style="min-width: 120px; vertical-align: top;">
@@ -138,9 +154,9 @@
                                                     @endphp
 
                                                     @foreach($assignments as $assignment)
-                                                        <div class="card border-0 shadow-sm p-2 mb-2 {{ $assignment->status == 'draft' ? 'bg-warning bg-opacity-25' : 'bg-white' }}">
+                                                        <div class="card border-0 shadow-sm p-2 mb-2 {{ $assignment->status == 'draft' ? 'bg-warning text-dark' : 'bg-body' }}">
                                                             <div class="d-flex justify-content-between align-items-center">
-                                                                <span class="fw-bold text-dark" style="font-size: 0.75rem;">{{ $assignment->subject->name ?? 'N/A' }}</span>
+                                                                <span class="fw-bold" style="font-size: 0.75rem;">{{ $assignment->subject->name ?? 'N/A' }}</span>
                                                                 @if($assignment->status == 'draft')
                                                                     <span class="badge bg-warning text-dark px-1 py-0" title="Rascunho"><i class="bi bi-clock"></i></span>
                                                                 @else
@@ -223,7 +239,11 @@
                             // Salvo com sucesso no draft
                             window.location.reload();
                         } else {
-                            alert('Erro ao alocar disciplina.');
+                            response.json().then(data => {
+                                alert(data.message || 'Erro ao alocar disciplina.');
+                            }).catch(() => {
+                                alert('Erro ao processar resposta do servidor.');
+                            });
                             clone.remove();
                         }
                     }).catch(() => {
