@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 
     // Módulo Secretaria
     Route::prefix('secretariat')->group(function () {
-        Route::resource('students', \App\Interfaces\Http\Controllers\StudentController::class)->except(['show']);
+        Route::resource('students', \App\Interfaces\Http\Controllers\StudentController::class);
         Route::resource('enrollments', \App\Interfaces\Http\Controllers\EnrollmentController::class)->except(['show', 'edit', 'update']);
     });
 

@@ -46,6 +46,7 @@ class StudentController extends Controller
                     }
                 })
                 ->addColumn('actions', function($student) {
+                    $showUrl = route('students.show', $student);
                     $editUrl = route('students.edit', $student);
                     $deleteUrl = route('students.destroy', $student);
                     $csrf = csrf_field();
@@ -53,6 +54,7 @@ class StudentController extends Controller
 
                     return '
                         <div class="text-end text-nowrap">
+                            <a href="' . $showUrl . '" class="btn btn-sm btn-light text-success fw-bold me-2"><i class="bi bi-file-earmark-bar-graph"></i> Boletim</a>
                             <a href="' . $editUrl . '" class="btn btn-sm btn-light text-primary fw-bold me-2"><i class="bi bi-pencil-square"></i> Editar</a>
                             <form action="' . $deleteUrl . '" method="POST" class="d-inline-block form-delete">
                                 ' . $csrf . $method . '
@@ -139,5 +141,79 @@ class StudentController extends Controller
     {
         $student->delete();
         return redirect()->route('students.index')->with('success', 'Aluno removido com sucesso!');
+    }
+
+    public function show(Student $student)
+    {
+        // Carrega todas as matrículas ativas do aluno
+        $enrollments = \App\Domains\Enrollment\Models\Enrollment::with(['schoolClass.grade', 'schoolClass.shift'])
+            ->where('student_id', $student->id)
+            ->whereIn('status', ['active', 'ativa'])
+            ->get();
+            
+        // Estrutura para montar o Boletim (agrupado por Matrícula/Turma)
+        $reportCards = [];
+
+        foreach ($enrollments as $enrollment) {
+            $classId = $enrollment->school_class_id;
+            
+            // Pega as matérias vinculadas a essa turma
+            $assignments = \App\Domains\Academic\Models\TeacherAssignment::with('subject')
+                ->where('school_class_id', $classId)
+                ->get();
+                
+            $subjectsData = [];
+            $totalClasses = 0;
+            $totalAbsences = 0;
+            
+            foreach ($assignments as $assignment) {
+                $subject = $assignment->subject;
+                
+                // Soma de notas deste aluno nesta matéria, nesta turma
+                $totalScore = \App\Domains\Academic\Models\GradeEntry::where('student_id', $student->id)
+                    ->whereHas('evaluation', function($q) use ($classId, $subject) {
+                        $q->where('school_class_id', $classId)
+                          ->where('subject_id', $subject->id);
+                    })->sum('score');
+                    
+                // Faltas (status = falta)
+                $absences = \App\Domains\Academic\Models\AttendanceRecord::where('student_id', $student->id)
+                    ->where('status', 'falta')
+                    ->whereHas('lesson', function($q) use ($classId, $subject) {
+                        $q->where('school_class_id', $classId)
+                          ->where('subject_id', $subject->id);
+                    })->count();
+                    
+                // Total de Aulas dadas dessa matéria
+                $lessonsCount = \App\Domains\Academic\Models\Lesson::where('school_class_id', $classId)
+                    ->where('subject_id', $subject->id)
+                    ->count();
+                    
+                $subjectsData[] = [
+                    'subject_name' => $subject->name,
+                    'total_score' => $totalScore,
+                    'absences' => $absences,
+                    'lessons_count' => $lessonsCount
+                ];
+                
+                $totalClasses += $lessonsCount;
+                $totalAbsences += $absences;
+            }
+            
+            // Frequência Global = (Total de Aulas - Faltas) / Total de Aulas
+            $globalAttendance = 100;
+            if ($totalClasses > 0) {
+                $globalAttendance = (($totalClasses - $totalAbsences) / $totalClasses) * 100;
+            }
+            
+            $reportCards[] = [
+                'enrollment' => $enrollment,
+                'subjects' => $subjectsData,
+                'global_attendance' => round($globalAttendance, 1),
+                'total_absences' => $totalAbsences
+            ];
+        }
+
+        return view('students.show', compact('student', 'reportCards'));
     }
 }
