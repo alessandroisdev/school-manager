@@ -210,7 +210,7 @@ class OfficialDocumentController extends Controller
         if ($officialDocument->unit_id != session('active_unit_id')) abort(403);
 
         // Buscar configurações da unidade (logo, nome, cidade)
-        $unit = \App\Domains\Admin\Models\Unit::with('setting')->find(session('active_unit_id'));
+        $unit = \App\Domains\Shared\Models\Unit::with('setting')->find(session('active_unit_id'));
         
         // Pega URL da logo da escola se houver, ou null
         $logoUrl = null;
