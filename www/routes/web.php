@@ -19,12 +19,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/unit/switch', [UnitSessionController::class, 'switch'])->name('unit.switch');
     
     // Todas as rotas do painel
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [\App\Interfaces\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+    // Portal do Aluno
+    Route::get('/student/portal', [\App\Interfaces\Http\Controllers\StudentPortalController::class, 'index'])->name('student.dashboard');
 
     // Módulo Financeiro
     Route::prefix('finance')->name('finance.')->group(function () {
         Route::get('/invoices', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'index'])->name('invoices.index');
         Route::patch('/invoices/{invoice}/pay', [\App\Interfaces\Http\Controllers\Finance\InvoiceController::class, 'pay'])->name('invoices.pay');
+    });
+
+    // Context Switcher (Alternar entre escolas)
+    Route::post('/context/switch', [\App\Interfaces\Http\Controllers\Admin\ContextController::class, 'switch'])->name('context.switch');
+
+    // Administração Global (Super Admin)
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('units', \App\Interfaces\Http\Controllers\Admin\UnitController::class)->except(['show']);
     });
 
     // Módulo Secretaria

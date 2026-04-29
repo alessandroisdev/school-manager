@@ -29,12 +29,33 @@
         <hr class="border-secondary mt-0">
         
         <ul class="nav nav-pills flex-column mb-auto">
+            
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor') || auth()->user()->hasRole('secretaria'))
             <li class="nav-item">
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-grid me-2"></i> Dashboard
+                    <i class="bi bi-grid me-2"></i> Dashboard Geral
                 </a>
             </li>
+            @endif
+
+            @if(auth()->user()->hasRole('aluno'))
+            <li class="nav-item mt-2">
+                <a href="{{ route('student.dashboard') }}" class="nav-link {{ request()->routeIs('student.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-badge me-2"></i> Meu Portal
+                </a>
+            </li>
+            @endif
+
+            @if(auth()->user()->hasRole('admin'))
+            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Gestão Global</h6>
+            <li>
+                <a href="{{ route('admin.units.index') }}" class="nav-link {{ request()->routeIs('admin.units.*') ? 'active' : '' }}">
+                    <i class="bi bi-building me-2"></i> Gestão de Franquias
+                </a>
+            </li>
+            @endif
             
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor') || auth()->user()->hasRole('secretaria'))
             <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Secretaria Central</h6>
             <li>
                 <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.*') ? 'active' : '' }}">
@@ -46,14 +67,9 @@
                     <i class="bi bi-link-45deg me-2"></i> Matrículas
                 </a>
             </li>
+            @endif
 
-            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Financeiro</h6>
-            <li>
-                <a href="{{ route('finance.invoices.index') }}" class="nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}">
-                    <i class="bi bi-wallet2 me-2"></i> Caixa Mensalidades
-                </a>
-            </li>
-
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor'))
             <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Módulo Pedagógico</h6>
             <li>
                 <a href="{{ route('academic.grades.index') }}" class="nav-link {{ request()->routeIs('academic.grades.*') ? 'active' : '' }}">
@@ -80,12 +96,18 @@
                     <i class="bi bi-diagram-3-fill me-2"></i> Alocação Docente
                 </a>
             </li>
+            @endif
+
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor') || auth()->user()->hasRole('professor'))
+            <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Ambiente de Aula</h6>
             <li>
                 <a href="{{ route('academic.diary.index') }}" class="nav-link {{ request()->routeIs('academic.diary.*') ? 'active' : '' }}">
                     <i class="bi bi-journal-text me-2"></i> Diário do Professor
                 </a>
             </li>
+            @endif
 
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor'))
             <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Recursos Humanos</h6>
             <li>
                 <a href="{{ route('hr.employees.index') }}" class="nav-link {{ request()->routeIs('hr.employees.*') ? 'active' : '' }}">
@@ -97,13 +119,16 @@
                     <i class="bi bi-journal-bookmark-fill me-2"></i> Corpo Docente
                 </a>
             </li>
+            @endif
 
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('diretor'))
             <h6 class="sidebar-heading px-3 mt-4 mb-2 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">Financeiro</h6>
             <li>
                 <a href="{{ route('finance.invoices.index') }}" class="nav-link {{ request()->routeIs('finance.invoices.*') ? 'active' : '' }}">
                     <i class="bi bi-cash-coin me-2"></i> Faturamento
                 </a>
             </li>
+            @endif
         </ul>
 
         <hr class="border-secondary">
@@ -132,7 +157,7 @@
             <h5 class="mb-0 text-dark fw-bold text-muted"><i class="bi bi-buildings me-2"></i> Unidade de Ensino</h5>
             <div class="d-flex align-items-center">
                 @if(Auth::user()->units->count() > 1)
-                    <form method="POST" action="{{ route('unit.switch') }}" class="m-0">
+                    <form method="POST" action="{{ route('context.switch') }}" class="m-0">
                         @csrf
                         <select name="unit_id" onchange="this.form.submit()" class="form-select form-select-sm border-0 bg-primary bg-opacity-10 fw-bold text-primary rounded-pill px-4 py-2 cursor-pointer shadow-sm">
                             @foreach(Auth::user()->units as $unit)
