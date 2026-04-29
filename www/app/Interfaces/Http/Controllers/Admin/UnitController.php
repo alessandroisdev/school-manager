@@ -17,7 +17,7 @@ class UnitController extends Controller
             return \Yajra\DataTables\Facades\DataTables::of($query)
                 ->editColumn('name', function($unit) {
                     return '<div class="fw-bold text-dark mb-0"><i class="bi bi-building me-1"></i> ' . $unit->name . '</div>
-                            <div class="small text-muted" style="font-size: 0.75rem;">' . ($unit->school->name ?? 'Matriz') . '</div>';
+                            <div class="small text-muted" style="font-size: 0.75rem;">' . ($unit->school?->name ?? 'Matriz') . '</div>';
                 })
                 ->addColumn('contact', function($unit) {
                     $phone = $unit->phone ? '<i class="bi bi-telephone text-muted me-1"></i> ' . $unit->phone : '<span class="text-muted small">Sem telefone</span>';
