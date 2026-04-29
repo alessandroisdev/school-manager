@@ -58,4 +58,9 @@ class Invoice extends Model implements AuditableContract
     {
         return $this->belongsTo(Enrollment::class);
     }
+
+    public function bankAccount(): BelongsTo
+    {
+        return $this->belongsTo(BankAccount::class);
+    }
 }

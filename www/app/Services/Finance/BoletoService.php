@@ -56,17 +56,22 @@ class BoletoService
 
         // Recupera responsável financeiro (pega o primeiro por padrão)
         $guardian = $student->guardians->first();
-        if (!$guardian) {
-            throw new \Exception("Aluno não possui responsável cadastrado para emissão de boleto.");
-        }
+
+        // Se não tiver responsável, usa os dados do próprio aluno como sacado
+        $sacadoName = $guardian ? $guardian->name : $student->name;
+        $sacadoDoc = $guardian ? ($guardian->cpf ?? $guardian->document) : $student->document;
+        $sacadoAddress = $guardian ? $guardian->address : $student->address_street;
+        $sacadoZip = $guardian ? $guardian->zipcode : $student->address_zipcode;
+        $sacadoCity = $guardian ? $guardian->city : $student->address_city;
+        $sacadoState = $guardian ? $guardian->state : $student->address_state;
 
         $sacado = new Agente(
-            $guardian->name, 
-            $guardian->cpf ?? $guardian->document ?? '000.000.000-00', 
-            $guardian->address ?? 'Endereço não cadastrado', 
-            $guardian->zipcode ?? '00000-000', 
-            $guardian->city ?? 'Cidade', 
-            $guardian->state ?? 'UF'
+            $sacadoName, 
+            $sacadoDoc ?? '000.000.000-00', 
+            $sacadoAddress ?? 'Endereço não cadastrado', 
+            $sacadoZip ?? '00000-000', 
+            $sacadoCity ?? 'Cidade', 
+            $sacadoState ?? 'UF'
         );
 
         $cedente = new Agente(

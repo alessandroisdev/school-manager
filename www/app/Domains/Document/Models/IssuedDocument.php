@@ -5,7 +5,7 @@ namespace App\Domains\Document\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\HasUnitScope;
+use App\Infrastructure\Persistence\Traits\HasUnitScope;
 
 class IssuedDocument extends Model
 {
